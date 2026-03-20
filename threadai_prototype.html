@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ThreadAI — Full Platform Prototype</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{--bg:#070709;--bg2:#0f0f14;--bg3:#18181f;--bg4:#1e1e27;--acc:#C8FF00;--acc2:#FF5E28;--acc3:#5E8BFF;--txt:#F2F2EE;--txt2:#777;--txt3:#3a3a3a;--card:#111116;--bdr:#1f1f28}
+body{background:#12121c;display:flex;align-items:center;justify-content:center;min-height:100vh;font-family:'DM Sans',sans-serif;padding:20px}
+.wrap{display:flex;flex-direction:column;align-items:center;gap:14px}
+.lbl{font-family:'Syne',sans-serif;font-size:11px;color:rgba(255,255,255,.3);letter-spacing:2.5px;text-transform:uppercase}
+.phone{width:300px;height:648px;background:var(--bg);border-radius:48px;border:7px solid #0a0a0e;overflow:hidden;position:relative;box-shadow:0 0 0 1px #1a1a24,0 50px 100px rgba(0,0,0,.9)}
+.notch{position:absolute;top:0;left:50%;transform:translateX(-50%);width:78px;height:22px;background:#0a0a0e;border-radius:0 0 14px 14px;z-index:100}
+.screen{position:absolute;inset:0;overflow:hidden;display:none}
+.screen.active{display:block}
+.sbar{height:44px;display:flex;align-items:flex-end;justify-content:space-between;padding:0 20px 8px;font-size:11px;color:var(--txt2);z-index:50;flex-shrink:0;position:relative}
+.sbody{position:absolute;top:44px;left:0;right:0;bottom:70px;overflow-y:auto;overflow-x:hidden}
+.sbody::-webkit-scrollbar{display:none}
+.bnav{position:absolute;bottom:0;left:0;right:0;height:70px;background:rgba(7,7,9,.96);backdrop-filter:blur(24px);border-top:1px solid var(--bdr);display:flex;align-items:center;justify-content:space-around;padding-bottom:8px;z-index:50}
+.bni{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer}
+.bni svg{width:21px;height:21px}
+.bni span{font-size:9px;color:var(--txt2)}
+.bni.on span{color:var(--acc)}
+.bni-mid{width:52px;height:52px;background:var(--acc);border-radius:18px;display:flex;align-items:center;justify-content:center;cursor:pointer;margin-top:-10px;box-shadow:0 4px 20px rgba(200,255,0,.25)}
+/* CARDS */
+.hscroll{display:flex;gap:10px;overflow-x:auto;padding:0 16px 4px}
+.hscroll::-webkit-scrollbar{display:none}
+.card{flex-shrink:0;border-radius:16px;overflow:hidden;position:relative;cursor:pointer}
+.card-lbl{position:absolute;bottom:0;left:0;right:0;padding:22px 10px 10px;background:linear-gradient(transparent,rgba(0,0,0,.85));font-family:'Syne',sans-serif;font-size:12px;color:#fff;font-weight:600}
+.badge{position:absolute;top:8px;right:8px;padding:3px 8px;border-radius:20px;font-size:10px;font-weight:700;font-family:'Syne',sans-serif}
+.bh{background:var(--acc2);color:#fff}
+.bn{background:#fff;color:#000}
+.bg{background:var(--acc);color:#000}
+/* SECTION HDR */
+.sh{display:flex;justify-content:space-between;align-items:center;padding:0 16px;margin:18px 0 10px}
+.sh h2{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--txt)}
+.sh a{font-size:11px;color:var(--txt2);cursor:pointer}
+/* COMPONENTS */
+.cd{background:var(--card);border-radius:16px;padding:14px;border:1px solid var(--bdr)}
+.pa{display:block;width:100%;padding:14px;background:var(--acc);color:#000;border:none;border-radius:14px;font-size:14px;font-weight:700;text-align:center;cursor:pointer;font-family:'Syne',sans-serif;letter-spacing:-.2px}
+.pb{display:block;width:100%;padding:13px;background:transparent;color:var(--acc);border:1.5px solid var(--acc);border-radius:14px;font-size:13px;font-weight:600;text-align:center;cursor:pointer;font-family:'DM Sans',sans-serif}
+.bk{background:none;border:none;color:var(--txt2);font-size:22px;cursor:pointer;padding:0;display:block;font-family:inherit;line-height:1}
+.fi{width:100%;background:var(--bg3);border:1px solid var(--bdr);border-radius:12px;padding:11px 14px;color:var(--txt);font-size:13px;outline:none;font-family:'DM Sans',sans-serif;box-sizing:border-box}
+.chip{padding:6px 12px;border-radius:20px;font-size:11px;border:1px solid var(--bdr);color:var(--txt2);cursor:pointer;background:var(--card);font-family:'DM Sans',sans-serif}
+.chip.on{border-color:var(--acc);color:var(--acc);background:rgba(200,255,0,.07)}
+.tab-row{display:flex;gap:0;background:var(--bg3);border-radius:14px;padding:3px;margin-bottom:16px}
+.tab{flex:1;padding:8px;border-radius:11px;font-size:11px;font-weight:600;text-align:center;cursor:pointer;color:var(--txt2);transition:.18s;font-family:'DM Sans',sans-serif;border:none;background:transparent}
+.tab.on{background:var(--txt);color:#000}
+.row{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.screen.active .sbody{animation:fadeUp .22s ease}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes scanline{0%,100%{top:10%}50%{top:82%}}
+@keyframes prog{0%{width:20%}100%{width:88%}}
+@keyframes pulse{0%,80%,100%{transform:scale(.6);opacity:.3}40%{transform:scale(1);opacity:1}}
+/* NAV DOTS */
+.ndots{display:flex;gap:5px;align-items:center}
+.ndot{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.15);cursor:pointer;transition:.2s}
+.ndot.on{background:var(--acc);width:14px;border-radius:3px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="lbl">ThreadAI — Full Platform Prototype</div>
+<div class="phone" id="ph">
+  <div class="notch"></div>
+
+  <!-- S0: HOME -->
+  <div class="screen active" id="s0">
+    <div class="sbar"><span>9:41</span><span style="display:flex;align-items:center;gap:6px"><span style="background:var(--bg3);border:1px solid var(--bdr);border-radius:8px;padding:3px 8px;font-size:11px;color:var(--acc);font-family:'Syne';font-weight:700;cursor:pointer" onclick="go('s7')">⭐ 3</span><div style="width:28px;height:28px;background:var(--acc);border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'Syne';font-size:11px;font-weight:800;color:#000;cursor:pointer" onclick="go('s9')">T</div></span></div>
+    <div class="sbody">
+      <div style="padding:0 16px 14px">
+        <div style="font-family:'Syne';font-size:22px;font-weight:800;color:var(--txt);margin-bottom:2px">ThreadAI</div>
+        <div style="font-size:12px;color:var(--txt2);margin-bottom:14px">Design it. Print it. Wear it.</div>
+        <!-- HERO BANNER -->
+        <div style="border-radius:20px;overflow:hidden;position:relative;height:170px;cursor:pointer;margin-bottom:14px" onclick="go('s1')">
+          <div style="position:absolute;inset:0;background:linear-gradient(135deg,#0d0d00,#1a1400,#0d0d00)"></div>
+          <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:flex-end;padding-right:16px;opacity:.12"><span style="font-size:100px">👕</span></div>
+          <div style="position:absolute;inset:0;padding:18px 20px;display:flex;flex-direction:column;justify-content:flex-end">
+            <div style="background:var(--acc);color:#000;font-family:'Syne';font-size:9px;font-weight:700;padding:3px 8px;border-radius:20px;width:fit-content;margin-bottom:8px;letter-spacing:.5px">✦ AI + PRINT + SHOP</div>
+            <div style="font-family:'Syne';font-size:21px;font-weight:800;color:var(--acc);line-height:1.1;margin-bottom:3px">One App.<br>Infinite Designs.</div>
+            <div style="font-size:12px;color:rgba(255,255,255,.45)">Generate → Print on machine or order online</div>
+          </div>
+        </div>
+        <!-- 3 MODE CARDS -->
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px">
+          <div onclick="go('s1')" style="background:var(--card);border:1px solid var(--bdr);border-radius:14px;padding:12px 8px;text-align:center;cursor:pointer">
+            <div style="font-size:22px;margin-bottom:5px">✦</div>
+            <div style="font-size:10px;font-weight:600;color:var(--acc);font-family:'Syne'">AI Generate</div>
+          </div>
+          <div onclick="go('s3')" style="background:var(--card);border:1px solid var(--acc2);border-radius:14px;padding:12px 8px;text-align:center;cursor:pointer">
+            <div style="font-size:22px;margin-bottom:5px">📡</div>
+            <div style="font-size:10px;font-weight:600;color:var(--acc2);font-family:'Syne'">Print Now</div>
+          </div>
+          <div onclick="go('s6')" style="background:var(--card);border:1px solid var(--acc3);border-radius:14px;padding:12px 8px;text-align:center;cursor:pointer">
+            <div style="font-size:22px;margin-bottom:5px">🛒</div>
+            <div style="font-size:10px;font-weight:600;color:var(--acc3);font-family:'Syne'">Order Online</div>
+          </div>
+        </div>
+        <!-- CREDITS -->
+        <div class="cd" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="width:34px;height:34px;background:var(--acc);border-radius:10px;display:flex;align-items:center;justify-content:center"><svg width="14" height="14" viewBox="0 0 14 14"><polygon points="7,1 9,5.5 14,6 10.5,9 11.5,14 7,11.5 2.5,14 3.5,9 0,6 5,5.5" fill="#000"/></svg></div>
+            <div><div style="font-size:10px;color:var(--txt2)">AI credits left</div><div style="font-family:'Syne';font-size:14px;font-weight:700;color:var(--txt)">3 / 3 free</div></div>
+          </div>
+          <button onclick="go('s7')" style="background:var(--acc2);color:#fff;border:none;border-radius:10px;padding:7px 14px;font-size:11px;font-weight:600;cursor:pointer;font-family:'DM Sans'">Upgrade</button>
+        </div>
+      </div>
+      <!-- TRENDING -->
+      <div class="sh"><h2>🔥 Trending Designs</h2><a>All →</a></div>
+      <div class="hscroll">
+        <div class="card" style="width:128px;height:152px" onclick="go('s1')"><div style="width:128px;height:152px;background:linear-gradient(135deg,#0d0020,#20000d);display:flex;align-items:center;justify-content:center;font-size:34px">🐺</div><div class="card-lbl">Cyber Wolf</div><div class="badge bh">HOT</div></div>
+        <div class="card" style="width:128px;height:152px" onclick="go('s1')"><div style="width:128px;height:152px;background:linear-gradient(135deg,#00200d,#00100d);display:flex;align-items:center;justify-content:center;font-size:34px">🌊</div><div class="card-lbl">Wave Force</div><div class="badge bh">HOT</div></div>
+        <div class="card" style="width:128px;height:152px" onclick="go('s1')"><div style="width:128px;height:152px;background:linear-gradient(135deg,#001020,#100020);display:flex;align-items:center;justify-content:center;font-size:34px">🪐</div><div class="card-lbl">Cosmic</div><div class="badge bn">NEW</div></div>
+        <div class="card" style="width:128px;height:152px" onclick="go('s1')"><div style="width:128px;height:152px;background:linear-gradient(135deg,#200010,#002000);display:flex;align-items:center;justify-content:center;font-size:34px">🌺</div><div class="card-lbl">Floral Vintage</div><div class="badge bg">FREE</div></div>
+      </div>
+      <!-- RECENT ORDERS -->
+      <div class="sh"><h2>📦 Recent Orders</h2><a>All →</a></div>
+      <div style="padding:0 16px;display:flex;flex-direction:column;gap:8px;margin-bottom:16px">
+        <div class="cd" style="display:flex;align-items:center;gap:12px"><div style="width:40px;height:40px;background:linear-gradient(135deg,#0d0020,#20000d);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🐺</div><div style="flex:1"><div style="font-size:13px;font-weight:600;color:var(--txt)">Cyber Wolf · Black L</div><div style="font-size:11px;color:var(--txt2)">PrintStation #07 · Printed on-site</div></div><div style="font-size:12px;color:#3ECC7A;font-weight:600">Done</div></div>
+        <div class="cd" style="display:flex;align-items:center;gap:12px"><div style="width:40px;height:40px;background:linear-gradient(135deg,#001020,#100020);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🌺</div><div style="flex:1"><div style="font-size:13px;font-weight:600;color:var(--txt)">Floral Bloom · White M</div><div style="font-size:11px;color:var(--txt2)">Online order · Shipping</div></div><div style="font-size:12px;color:var(--acc3);font-weight:600">In transit</div></div>
+      </div>
+    </div>
+    <div class="bnav">
+      <div class="bni on" onclick="go('s0')"><svg viewBox="0 0 22 22" fill="none"><path d="M3 9.5L11 3l8 6.5V19a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z" stroke="#C8FF00" stroke-width="1.6"/></svg><span style="color:var(--acc)">Home</span></div>
+      <div class="bni" onclick="go('s5')"><svg viewBox="0 0 22 22" fill="none"><rect x="2" y="2" width="18" height="18" rx="4" stroke="#777" stroke-width="1.6"/><path d="M2 15l5-5 4 4 3-3 8 8" stroke="#777" stroke-width="1.6"/></svg><span>Gallery</span></div>
+      <div class="bni-mid" onclick="go('s1')"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M11 4v14M4 11h14" stroke="#000" stroke-width="2.5" stroke-linecap="round"/></svg></div>
+      <div class="bni" onclick="go('s6')"><svg viewBox="0 0 22 22" fill="none"><path d="M3 3h2l2 9h10l2-6H7" stroke="#777" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="19" r="1.5" fill="#777"/><circle cx="17" cy="19" r="1.5" fill="#777"/></svg><span>Shop</span></div>
+      <div class="bni" onclick="go('s9')"><svg viewBox="0 0 22 22" fill="none"><circle cx="11" cy="7" r="4" stroke="#777" stroke-width="1.6"/><path d="M3 20c0-4.4 3.6-8 8-8s8 3.6 8 8" stroke="#777" stroke-width="1.6"/></svg><span>Profile</span></div>
+    </div>
+  </div>
+
+  <!-- S1: AI GENERATE -->
+  <div class="screen" id="s1">
+    <div class="sbar"><span class="bk" onclick="go('s0')">‹</span><span style="font-family:'Syne';font-size:14px;font-weight:700;color:var(--txt)">AI Studio</span><span style="font-size:11px;color:var(--acc)">⭐ 3 left</span></div>
+    <div class="sbody" style="padding:8px 16px 20px">
+      <div class="tab-row">
+        <button class="tab on">✦ Text prompt</button>
+        <button class="tab" onclick="go('s2')">↑ Upload ref</button>
+      </div>
+      <div style="background:var(--bg3);border:1px solid var(--bdr);border-radius:16px;padding:14px;margin-bottom:12px">
+        <textarea class="fi" rows="4" style="background:transparent;border:none;padding:0;resize:none" placeholder="e.g. A fierce wolf under neon lights, cyberpunk style, dark background">A fierce wolf under neon lights, cyberpunk style, dark background, ultra detailed</textarea>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;padding-top:8px;border-top:1px solid var(--bdr)"><span style="font-size:11px;color:var(--txt2)">Be specific for best results</span><button style="background:var(--bg4);border:none;border-radius:8px;padding:4px 10px;color:var(--txt2);font-size:11px;cursor:pointer;font-family:'DM Sans'">🎲 Random</button></div>
+      </div>
+      <div style="margin-bottom:12px"><div style="font-size:10px;color:var(--txt2);margin-bottom:7px;text-transform:uppercase;letter-spacing:.5px">Art Style</div><div style="display:flex;gap:6px;flex-wrap:wrap"><div class="chip on">Illustration</div><div class="chip">Photorealistic</div><div class="chip">Watercolor</div><div class="chip">Neon</div><div class="chip">Anime</div></div></div>
+      <div style="margin-bottom:14px"><div style="font-size:10px;color:var(--txt2);margin-bottom:7px;text-transform:uppercase;letter-spacing:.5px">Mood</div><div style="display:flex;gap:6px"><div class="chip on">Dark</div><div class="chip">Vibrant</div><div class="chip">Pastel</div><div class="chip">Mono</div></div></div>
+      <button class="pa" onclick="go('s_gen')" style="margin-bottom:8px">✦ Generate Design</button>
+      <div style="text-align:center;font-size:11px;color:var(--txt2);margin-bottom:14px">Uses 1 free credit (2 remaining)</div>
+      <!-- AFTER GENERATE SHOW OPTIONS -->
+      <div style="background:linear-gradient(135deg,rgba(200,255,0,.06),rgba(94,139,255,.06));border:1px solid rgba(200,255,0,.15);border-radius:14px;padding:13px">
+        <div style="font-size:11px;font-weight:600;color:var(--txt);margin-bottom:8px">After generating you can:</div>
+        <div style="display:flex;gap:6px">
+          <div style="flex:1;background:var(--bg3);border-radius:10px;padding:9px 6px;text-align:center;cursor:pointer" onclick="go('s3')"><div style="font-size:16px;margin-bottom:3px">📡</div><div style="font-size:10px;color:var(--acc2)">Print on machine</div></div>
+          <div style="flex:1;background:var(--bg3);border-radius:10px;padding:9px 6px;text-align:center;cursor:pointer" onclick="go('s6')"><div style="font-size:16px;margin-bottom:3px">🛒</div><div style="font-size:10px;color:var(--acc3)">Order online</div></div>
+          <div style="flex:1;background:var(--bg3);border-radius:10px;padding:9px 6px;text-align:center;cursor:pointer" onclick="go('s_result')"><div style="font-size:16px;margin-bottom:3px">⬇</div><div style="font-size:10px;color:var(--txt2)">Just download</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- S2: UPLOAD REFERENCE -->
+  <div class="screen" id="s2">
+    <div class="sbar"><span class="bk" onclick="go('s1')">‹</span><span style="font-family:'Syne';font-size:14px;font-weight:700;color:var(--txt)">AI Studio</span><span style="font-size:11px;color:var(--acc)">⭐ 3 left</span></div>
+    <div class="sbody" style="padding:8px 16px 20px">
+      <div class="tab-row"><button class="tab" onclick="go('s1')">✦ Text prompt</button><button class="tab on">↑ Upload ref</button></div>
+      <div style="border:1.5px dashed var(--bdr);border-radius:16px;padding:26px 16px;text-align:center;margin-bottom:12px;cursor:pointer">
+        <svg width="32" height="32" viewBox="0 0 32 32" fill="none" style="display:block;margin:0 auto 8px"><rect x="3" y="7" width="26" height="20" rx="5" stroke="#C8FF00" stroke-width="2"/><path d="M16 12v10M11 17l5-5 5 5" stroke="#C8FF00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <p style="font-size:13px;color:var(--txt2)">Upload your image <span style="color:var(--acc)">or tap to browse</span></p>
+      </div>
+      <div class="cd" style="display:flex;align-items:center;gap:10px;margin-bottom:12px;border-color:rgba(200,255,0,.3)">
+        <div style="width:44px;height:44px;background:linear-gradient(135deg,#0d0020,#20000d);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">🖼</div>
+        <div style="flex:1"><div style="font-size:13px;color:var(--txt);font-weight:500">my_logo.png</div><div style="font-size:11px;color:var(--txt2)">2.1 MB · Ready</div></div>
+        <div style="color:var(--acc);font-size:18px">✓</div>
+      </div>
+      <div style="background:var(--bg3);border:1px solid var(--bdr);border-radius:16px;padding:12px;margin-bottom:12px">
+        <textarea class="fi" rows="3" style="background:transparent;border:none;padding:0;resize:none" placeholder="Describe modifications...">Apply cyberpunk neon glow, keep the original layout</textarea>
+      </div>
+      <div style="margin-bottom:14px"><div style="font-size:10px;color:var(--txt2);margin-bottom:7px;text-transform:uppercase;letter-spacing:.5px">Transform Strength</div><div style="display:flex;gap:6px"><div class="chip">Subtle</div><div class="chip on">Medium</div><div class="chip">Strong</div></div></div>
+      <button class="pa" onclick="go('s_gen')">✦ Generate Design</button>
+    </div>
+  </div>
+
+  <!-- S_GEN: GENERATING -->
+  <div class="screen" id="s_gen">
+    <div class="sbar"><span></span><span style="font-family:'Syne';font-size:14px;font-weight:700;color:var(--txt)">Creating...</span><span></span></div>
+    <div style="position:absolute;inset:44px 0 0 0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center">
+      <div style="width:88px;height:88px;border-radius:28px;background:var(--bg3);border:1px solid var(--bdr);display:flex;align-items:center;justify-content:center;margin-bottom:22px;position:relative;overflow:hidden">
+        <div style="position:absolute;inset:0;background:conic-gradient(var(--acc) 0deg,transparent 90deg);animation:spin .8s linear infinite;opacity:.25"></div>
+        <svg width="34" height="34" viewBox="0 0 34 34" fill="none"><polygon points="17,2 20,12 30,12 22,18 25,28 17,22 9,28 12,18 4,12 14,12" fill="#C8FF00"/></svg>
+      </div>
+      <div style="font-family:'Syne';font-size:21px;font-weight:800;color:var(--txt);margin-bottom:7px">AI is creating your design...</div>
+      <div style="font-size:13px;color:var(--txt2);margin-bottom:28px">Usually 5–15 seconds</div>
+      <div style="width:100%;background:var(--bg3);border-radius:100px;height:4px;overflow:hidden;margin-bottom:28px">
+        <div style="height:100%;background:var(--acc);border-radius:100px;animation:prog 2.2s ease infinite alternate"></div>
+      </div>
+      <button onclick="go('s_result')" style="background:var(--bg3);border:1px solid var(--bdr);border-radius:12px;padding:11px 26px;color:var(--txt2);font-family:'DM Sans';font-size:13px;cursor:pointer">Preview result →</button>
+    </div>
+  </div>
+
+  <!-- S_RESULT: RESULT -->
+  <div class="screen" id="s_result">
+    <div class="sbar"><span class="bk" onclick="go('s1')">‹</span><span style="font-family:'Syne';font-size:14px;font-weight:700;color:var(--txt)">Your Design</span><span style="font-size:12px;color:var(--txt2)">Share</span></div>
+    <div class="sbody" style="padding:8px 16px 20px">
+      <div style="background:var(--bg3);border-radius:18px;padding:18px;text-align:center;margin-bottom:12px;border:1px solid var(--bdr)">
+        <div style="height:180px;display:flex;align-items:center;justify-content:center;flex-direction:column">
+          <div style="font-size:62px;margin-bottom:6px">🐺</div>
+          <div style="font-size:11px;color:rgba(200,255,0,.4);font-family:'Syne'">AI Generated · Cyber Wolf</div>
+        </div>
+      </div>
+      <!-- WHAT DO YOU WANT TO DO? -->
+      <div style="font-family:'Syne';font-size:13px;font-weight:700;color:var(--txt);margin-bottom:10px">What do you want to do with it?</div>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px">
+        <div onclick="go('s3')" style="background:var(--card);border:1.5px solid var(--acc2);border-radius:14px;padding:14px;display:flex;align-items:center;gap:12px;cursor:pointer">
+          <div style="width:40px;height:40px;background:rgba(255,94,40,.12);border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:20px">📡</div>
+          <div><div style="font-size:14px;font-weight:600;color:var(--txt)">Print on Machine</div><div style="font-size:11px;color:var(--txt2)">Scan QR → Bluetooth → instant print</div></div>
+          <div style="color:var(--acc2);margin-left:auto">›</div>
+        </div>
+        <div onclick="go('s6')" style="background:var(--card);border:1.5px solid var(--acc3);border-radius:14px;padding:14px;display:flex;align-items:center;gap:12px;cursor:pointer">
+          <div style="width:40px;height:40px;background:rgba(94,139,255,.12);border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:20px">🛒</div>
+          <div><div style="font-size:14px;font-weight:600;color:var(--txt)">Order Online</div><div style="font-size:11px;color:var(--txt2)">Pick size + colour → delivered to you</div></div>
+          <div style="color:var(--acc3);margin-left:auto">›</div>
+        </div>
+        <div style="background:var(--card);border:1px solid var(--bdr);border-radius:14px;padding:14px;display:flex;align-items:center;gap:12px;cursor:pointer">
+          <div style="width:40px;height:40px;background:rgba(255,255,255,.04);border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:20px">⬇</div>
+          <div><div style="font-size:14px;font-weight:600;color:var(--txt)">Download PNG</div><div style="font-size:11px;color:var(--txt2)">4K · print-ready file saved to gallery</div></div>
+          <div style="color:var(--txt2);margin-left:auto">›</div>
+        </div>
+      </div>
+      <div style="background:rgba(200,255,0,.06);border:1px solid rgba(200,255,0,.15);border-radius:12px;padding:11px 14px;font-size:11px;color:var(--txt2)">⭐ 2 free generations remaining · <span style="color:var(--acc);cursor:pointer" onclick="go('s7')">Upgrade for unlimited</span></div>
+    </div>
+  </div>
+
+  <!-- S3: QR SCAN -->
+  <div class="screen" id="s3">
+    <div class="sbar"><span class="bk" onclick="go('s0')">‹</span><span style="font-family:'Syne';font-size:14px;font-weight:700;color:var(--txt)">Print on Machine</span><span></span></div>
+    <div style="position:absolute;inset:44px 0 0 0;background:#050508;display:flex;flex-direction:column">
+      <div style="padding:10px 18px;display:flex;justify-content:space-between;align-items:center">
+        <div style="font-size:13px;color:rgba(255,255,255,.4)">Step 1 of 3</div>
+        <div style="display:flex;gap:5px"><div style="width:22px;height:3px;border-radius:2px;background:var(--acc)"></div><div style="width:22px;height:3px;border-radius:2px;background:rgba(255,255,255,.15)"></div><div style="width:22px;height:3px;border-radius:2px;background:rgba(255,255,255,.15)"></div></div>
+      </div>
+      <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 30px">
+        <div style="font-size:13px;color:rgba(255,255,255,.4);margin-bottom:18px;text-align:center">Point camera at the QR code on the vending machine</div>
+        <div style="position:relative;width:200px;height:200px">
+          <div style="position:absolute;top:0;left:0;width:28px;height:28px;border-top:3px solid var(--acc);border-left:3px solid var(--acc);border-radius:4px 0 0 0"></div>
+          <div style="position:absolute;top:0;right:0;width:28px;height:28px;border-top:3px solid var(--acc);border-right:3px solid var(--acc);border-radius:0 4px 0 0"></div>
+          <div style="position:absolute;bottom:0;left:0;width:28px;height:28px;border-bottom:3px solid var(--acc);border-left:3px solid var(--acc);border-radius:0 0 0 4px"></div>
+          <div style="position:absolute;bottom:0;right:0;width:28px;height:28px;border-bottom:3px solid var(--acc);border-right:3px solid var(--acc);border-radius:0 0 4px 0"></div>
+          <div style="position:absolute;inset:8px;background:#080810;border-radius:4px;overflow:hidden">
+            <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)"><svg viewBox="0 0 72 72" width="68" height="68"><rect x="0" y="0" width="24" height="24" rx="3" fill="none" stroke="rgba(255,255,255,.6)" stroke-width="2.5"/><rect x="48" y="0" width="24" height="24" rx="3" fill="none" stroke="rgba(255,255,255,.6)" stroke-width="2.5"/><rect x="0" y="48" width="24" height="24" rx="3" fill="none" stroke="rgba(255,255,255,.6)" stroke-width="2.5"/><rect x="8" y="8" width="8" height="8" rx="1" fill="rgba(255,255,255,.6)"/><rect x="56" y="8" width="8" height="8" rx="1" fill="rgba(255,255,255,.6)"/><rect x="8" y="56" width="8" height="8" rx="1" fill="rgba(255,255,255,.6)"/><rect x="36" y="36" width="4" height="4" fill="rgba(255,255,255,.4)"/><rect x="42" y="36" width="4" height="4" fill="rgba(255,255,255,.4)"/><rect x="48" y="36" width="4" height="4" fill="rgba(255,255,255,.4)"/><rect x="36" y="42" width="4" height="4" fill="rgba(255,255,255,.4)"/><rect x="48" y="42" width="4" height="4" fill="rgba(255,255,255,.4)"/><rect x="36" y="48" width="4" height="4" fill="rgba(255,255,255,.4)"/><rect x="42" y="48" width="4" height="4" fill="rgba(255,255,255,.4)"/><rect x="48" y="48" width="4" height="4" fill="rgba(255,255,255,.4)"/><rect x="57" y="36" width="4" height="4" fill="rgba(255,255,255,.4)"/></svg></div>
+            <div style="position:absolute;left:0;right:0;height:2px;background:var(--acc);opacity:.8;animation:scanline 2s ease-in-out infinite"></div>
+          </div>
+        </div>
+      </div>
+      <div style="padding:16px 20px 22px"><button class="pa" onclick="go('s4')">Simulate Scan ✓</button></div>
+    </div>
+  </div>
+
+  <!-- S4: MACHINE FOUND + DESIGN CONFIRM -->
+  <div class="screen" id="s4">
+    <div class="sbar"><span class="bk" onclick="go('s3')">‹</span><span style="font-family:'Syne';font-size:14px;font-weight:700;color:var(--txt)">Machine Found</span><span></span></div>
+    <div class="sbody" style="padding:12px 16px 20px">
+      <div style="padding:10px 0;display:flex;justify-content:flex-end;margin-bottom:4px">
+        <div style="display:flex;gap:5px"><div style="width:22px;height:3px;border-radius:2px;background:var(--acc)"></div><div style="width:22px;height:3px;border-radius:2px;background:var(--acc)"></div><div style="width:22px;height:3px;border-radius:2px;background:rgba(255,255,255,.15)"></div></div>
+      </div>
+      <!-- MACHINE STATUS -->
+      <div class="cd" style="text-align:center;padding:18px;margin-bottom:12px">
+        <div style="width:56px;height:56px;margin:0 auto 12px;position:relative;display:flex;align-items:center;justify-content:center">
+          <div style="position:absolute;width:56px;height:56px;border-radius:50%;border:1.5px solid var(--acc);opacity:.2"></div>
+          <div style="width:38px;height:38px;background:var(--acc);border-radius:50%;display:flex;align-items:center;justify-content:center">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M2 9a7 7 0 1 1 7 7" stroke="#000" stroke-width="2" stroke-linecap="round"/><path d="M5 9l2 2 4-4" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+        </div>
+        <div style="font-size:10px;color:#3ECC7A;font-weight:700;letter-spacing:1px;margin-bottom:4px">● CONNECTED</div>
+        <div style="font-family:'Syne';font-size:18px;font-weight:800;color:var(--txt);margin-bottom:2px">PrintStation #07</div>
+        <div style="font-size:12px;color:var(--txt2)">Petrzalka Mall · Level 2</div>
+      </div>
+      <!-- DESIGN SELECTION -->
+      <div style="font-size:11px;color:var(--txt2);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">Choose Design to Print</div>
+      <div style="display:flex;gap:8px;margin-bottom:12px">
+        <div style="flex:1;background:var(--bg3);border:2px solid var(--acc);border-radius:14px;padding:12px;text-align:center;cursor:pointer">
+          <div style="font-size:28px;margin-bottom:4px">🐺</div>
+          <div style="font-size:10px;color:var(--acc);font-weight:600">Cyber Wolf</div>
+          <div style="font-size:9px;color:var(--txt2)">AI Generated</div>
+        </div>
+        <div style="flex:1;background:var(--bg3);border:1px solid var(--bdr);border-radius:14px;padding:12px;text-align:center;cursor:pointer">
+          <div style="font-size:28px;margin-bottom:4px">🌺</div>
+          <div style="font-size:10px;color:var(--txt2);font-weight:600">Floral Bloom</div>
+          <div style="font-size:9px;color:var(--txt2)">Saved design</div>
+        </div>
+        <div onclick="go('s1')" style="flex:1;background:var(--bg3);border:1px dashed var(--txt3);border-radius:14px;padding:12px;text-align:center;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center">
+          <div style="font-size:22px;color:var(--txt3);margin-bottom:4px">+</div>
+          <div style="font-size:10px;color:var(--txt3)">New design</div>
+        </div>
+      </div>
+      <!-- SHIRT OPTIONS -->
+      <div class="cd" style="margin-bottom:12px">
+        <div class="row"><span style="font-size:12px;color:var(--txt2)">Shirt Colour</span></div>
+        <div style="display:flex;gap:8px;margin-bottom:12px">
+          <div style="width:28px;height:28px;background:#111;border-radius:50%;border:2.5px solid var(--acc);cursor:pointer"></div>
+          <div style="width:28px;height:28px;background:#eee;border-radius:50%;border:1px solid var(--bdr);cursor:pointer"></div>
+          <div style="width:28px;height:28px;background:#1a3a5c;border-radius:50%;border:1px solid var(--bdr);cursor:pointer"></div>
+          <div style="width:28px;height:28px;background:#2a1a0a;border-radius:50%;border:1px solid var(--bdr);cursor:pointer"></div>
+        </div>
+        <div class="row" style="margin-bottom:0"><span style="font-size:12px;color:var(--txt2)">Size</span><div style="display:flex;gap:6px"><div style="padding:5px 10px;border-radius:8px;background:var(--bg3);font-size:11px;color:var(--txt2);cursor:pointer">S</div><div style="padding:5px 10px;border-radius:8px;background:var(--acc);font-size:11px;color:#000;font-weight:600;cursor:pointer">M</div><div style="padding:5px 10px;border-radius:8px;background:var(--bg3);font-size:11px;color:var(--txt2);cursor:pointer">L</div><div style="padding:5px 10px;border-radius:8px;background:var(--bg3);font-size:11px;color:var(--txt2);cursor:pointer">XL</div></div></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;padding:0 2px"><div style="font-size:13px;color:var(--txt2)">Total</div><div style="font-family:'Syne';font-size:22px;font-weight:800;color:var(--txt)">€24.99</div></div>
+      <button class="pa" onclick="go('s_pay')">Continue to Payment →</button>
+    </div>
+  </div>
+
+  <!-- S5: GALLERY -->
+  <div class="screen" id="s5">
+    <div class="sbar"><span class="bk" onclick="go('s0')">‹</span><span style="font-family:'Syne';font-size:14px;font-weight:700;color:var(--txt)">My Gallery</span><span style="font-size:11px;color:var(--txt2)">Filter</span></div>
+    <div class="sbody" style="padding-top:10px">
+      <div style="display:flex;gap:7px;padding:0 16px;margin-bottom:14px">
+        <div style="background:var(--acc);color:#000;padding:5px 13px;border-radius:20px;font-size:11px;font-weight:700;cursor:pointer">All</div>
+        <div style="background:var(--card);color:var(--txt2);padding:5px 13px;border-radius:20px;font-size:11px;border:1px solid var(--bdr);cursor:pointer">AI Generated</div>
+        <div style="background:var(--card);color:var(--txt2);padding:5px 13px;border-radius:20px;font-size:11px;border:1px solid var(--bdr);cursor:pointer">Uploaded</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 16px">
+        <div onclick="go('s_result')" style="border-radius:14px;overflow:hidden;cursor:pointer;position:relative"><div style="height:146px;background:linear-gradient(135deg,#0d0020,#20000d);display:flex;align-items:center;justify-content:center;font-size:40px">🐺</div><div style="position:absolute;bottom:0;left:0;right:0;padding:16px 8px 8px;background:linear-gradient(transparent,rgba(0,0,0,.8));font-size:10px;color:#fff">Cyber Wolf</div></div>
+        <div onclick="go('s_result')" style="border-radius:14px;overflow:hidden;cursor:pointer;position:relative"><div style="height:146px;background:linear-gradient(135deg,#001020,#100020);display:flex;align-items:center;justify-content:center;font-size:40px">🌊</div><div style="position:absolute;bottom:0;left:0;right:0;padding:16px 8px 8px;background:linear-gradient(transparent,rgba(0,0,0,.8));font-size:10px;color:#fff">Ocean Wave</div></div>
+        <div onclick="go('s_result')" style="border-radius:14px;overflow:hidden;cursor:pointer;position:relative"><div style="height:146px;background:linear-gradient(135deg,#001a0d,#1a000d);display:flex;align-items:center;justify-content:center;font-size:40px">🌺</div><div style="position:absolute;bottom:0;left:0;right:0;padding:16px 8px 8px;background:linear-gradient(transparent,rgba(0,0,0,.8));font-size:10px;color:#fff">Floral Bloom</div></div>
+        <div onclick="go('s7')" style="border-radius:14px;overflow:hidden;cursor:pointer;position:relative"><div style="height:146px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:40px;filter:blur(3px)">🐉</div><div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(0,0,0,.55)"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="3" y="8" width="14" height="10" rx="3" stroke="#C8FF00" stroke-width="1.6"/><path d="M6 8V6a4 4 0 0 1 8 0v2" stroke="#C8FF00" stroke-width="1.6"/></svg><div style="font-size:9px;color:var(--acc);margin-top:5px">Upgrade</div></div></div>
+      </div>
+      <div style="height:16px"></div>
+    </div>
+    <div class="bnav">
+      <div class="bni" onclick="go('s0')"><svg viewBox="0 0 22 22" fill="none"><path d="M3 9.5L11 3l8 6.5V19a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z" stroke="#777" stroke-width="1.6"/></svg><span>Home</span></div>
+      <div class="bni on"><svg viewBox="0 0 22 22" fill="none"><rect x="2" y="2" width="18" height="18" rx="4" stroke="#C8FF00" stroke-width="1.6"/><path d="M2 15l5-5 4 4 3-3 8 8" stroke="#C8FF00" stroke-width="1.6"/></svg><span style="color:var(--acc)">Gallery</span></div>
+      <div class="bni-mid" onclick="go('s1')"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M11 4v14M4 11h14" stroke="#000" stroke-width="2.5" stroke-linecap="round"/></svg></div>
+      <div class="bni" onclick="go('s6')"><svg viewBox="0 0 22 22" fill="none"><path d="M3 3h2l2 9h10l2-6H7" stroke="#777" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="19" r="1.5" fill="#777"/><circle cx="17" cy="19" r="1.5" fill="#777"/></svg><span>Shop</span></div>
+      <div class="bni" onclick="go('s9')"><svg viewBox="0 0 22 22" fill="none"><circle cx="11" cy="7" r="4" stroke="#777" stroke-width="1.6"/><path d="M3 20c0-4.4 3.6-8 8-8s8 3.6 8 8" stroke="#777" stroke-width="1.6"/></svg><span>Profile</span></div>
+    </div>
+  </div>
+
+  <!-- S6: ONLINE SHOP -->
+  <div class="screen" id="s6">
+    <div class="sbar"><span class="bk" onclick="go('s0')">‹</span><span style="font-family:'Syne';font-size:14px;font-weight:700;color:var(--txt)">Order Online</span><span style="font-size:12px;color:var(--acc3);cursor:pointer">Cart (1)</span></div>
+    <div class="sbody" style="padding:10px 16px 20px">
+      <div style="background:linear-gradient(135deg,rgba(94,139,255,.1),rgba(94,139,255,.04));border:1px solid rgba(94,139,255,.2);border-radius:14px;padding:12px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px">
+        <div style="font-size:20px">🚚</div>
+        <div style="font-size:12px;color:var(--txt2)"><span style="color:var(--acc3);font-weight:600">Free shipping</span> on orders over €35 · EU delivery 3–7 days</div>
+      </div>
+      <!-- DESIGN CARD -->
+      <div style="font-size:11px;color:var(--txt2);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">Your Design</div>
+      <div class="cd" style="display:flex;gap:12px;margin-bottom:14px;border-color:rgba(94,139,255,.25)">
+        <div style="width:64px;height:64px;background:linear-gradient(135deg,#0d0020,#20000d);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:30px;flex-shrink:0">🐺</div>
+        <div style="flex:1">
+          <div style="font-size:14px;font-weight:600;color:var(--txt);margin-bottom:2px">Cyber Wolf</div>
+          <div style="font-size:11px;color:var(--txt2);margin-bottom:8px">AI Generated · Your design</div>
+          <div onclick="go('s1')" style="font-size:11px;color:var(--acc3);cursor:pointer">Change design →</div>
+        </div>
+      </div>
+      <!-- SHIRT CONFIG -->
+      <div style="font-size:11px;color:var(--txt2);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">Configure</div>
+      <div class="cd" style="margin-bottom:14px">
+        <div class="row"><span style="font-size:13px;color:var(--txt2)">Colour</span>
+          <div style="display:flex;gap:6px">
+            <div style="width:24px;height:24px;background:#111;border-radius:50%;border:2px solid var(--acc3);cursor:pointer"></div>
+            <div style="width:24px;height:24px;background:#eee;border-radius:50%;border:1px solid var(--bdr);cursor:pointer"></div>
+            <div style="width:24px;height:24px;background:#1a3a5c;border-radius:50%;border:1px solid var(--bdr);cursor:pointer"></div>
+          </div>
+        </div>
+        <div class="row"><span style="font-size:13px;color:var(--txt2)">Size</span>
+          <div style="display:flex;gap:5px">
+            <div style="padding:4px 9px;border-radius:7px;background:var(--bg3);font-size:11px;color:var(--txt2)">S</div>
+            <div style="padding:4px 9px;border-radius:7px;background:var(--acc3);font-size:11px;color:#fff;font-weight:600">L</div>
+            <div style="padding:4px 9px;border-radius:7px;background:var(--bg3);font-size:11px;color:var(--txt2)">XL</div>
+          </div>
+        </div>
+        <div class="row" style="margin-bottom:0"><span style="font-size:13px;color:var(--txt2)">Quantity</span>
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="width:28px;height:28px;background:var(--bg3);border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;color:var(--txt2)">−</div>
+            <span style="font-family:'Syne';font-size:16px;font-weight:700;color:var(--txt)">1</span>
+            <div style="width:28px;height:28px;background:var(--bg3);border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;color:var(--txt2)">+</div>
+          </div>
+        </div>
+      </div>
+      <!-- ORDER SUMMARY -->
+      <div class="cd" style="margin-bottom:14px">
+        <div class="row"><span style="font-size:13px;color:var(--txt2)">T-shirt + print</span><span style="font-size:13px;color:var(--txt)">€29.99</span></div>
+        <div class="row"><span style="font-size:13px;color:var(--txt2)">Shipping</span><span style="font-size:13px;color:#3ECC7A">Free</span></div>
+        <div style="height:1px;background:var(--bdr);margin:4px 0 10px"></div>
+        <div style="display:flex;justify-content:space-between"><span style="font-size:14px;font-weight:600;color:var(--txt)">Total</span><span style="font-family:'Syne';font-size:18px;font-weight:800;color:var(--txt)">€29.99</span></div>
+      </div>
+      <button class="pa" onclick="go('s_pay')" style="margin-bottom:8px">Proceed to Checkout →</button>
+    </div>
+    <div class="bnav">
+      <div class="bni" onclick="go('s0')"><svg viewBox="0 0 22 22" fill="none"><path d="M3 9.5L11 3l8 6.5V19a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z" stroke="#777" stroke-width="1.6"/></svg><span>Home</span></div>
+      <div class="bni" onclick="go('s5')"><svg viewBox="0 0 22 22" fill="none"><rect x="2" y="2" width="18" height="18" rx="4" stroke="#777" stroke-width="1.6"/><path d="M2 15l5-5 4 4 3-3 8 8" stroke="#777" stroke-width="1.6"/></svg><span>Gallery</span></div>
+      <div class="bni-mid" onclick="go('s1')"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M11 4v14M4 11h14" stroke="#000" stroke-width="2.5" stroke-linecap="round"/></svg></div>
+      <div class="bni on"><svg viewBox="0 0 22 22" fill="none"><path d="M3 3h2l2 9h10l2-6H7" stroke="#5E8BFF" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="19" r="1.5" fill="#5E8BFF"/><circle cx="17" cy="19" r="1.5" fill="#5E8BFF"/></svg><span style="color:var(--acc3)">Shop</span></div>
+      <div class="bni" onclick="go('s9')"><svg viewBox="0 0 22 22" fill="none"><circle cx="11" cy="7" r="4" stroke="#777" stroke-width="1.6"/><path d="M3 20c0-4.4 3.6-8 8-8s8 3.6 8 8" stroke="#777" stroke-width="1.6"/></svg><span>Profile</span></div>
+    </div>
+  </div>
+
+  <!-- S7: PAYWALL -->
+  <div class="screen" id="s7">
+    <div class="sbar"><span class="bk" onclick="go('s0')">‹</span><span></span><span></span></div>
+    <div class="sbody" style="padding:0 16px 24px">
+      <div style="text-align:center;padding:14px 0 18px">
+        <div style="width:58px;height:58px;background:var(--acc);border-radius:20px;margin:0 auto 12px;display:flex;align-items:center;justify-content:center"><svg width="26" height="26" viewBox="0 0 26 26" fill="none"><polygon points="13,2 16,9 23,9 17.5,13.5 19.5,21 13,17 6.5,21 8.5,13.5 3,9 10,9" fill="#000"/></svg></div>
+        <div style="font-family:'Syne';font-size:23px;font-weight:800;color:var(--txt);margin-bottom:5px">Go Unlimited</div>
+        <div style="font-size:12px;color:var(--txt2);line-height:1.7">You've used all 3 free AI generations.<br>Upgrade to keep creating.</div>
+      </div>
+      <div class="cd" style="margin-bottom:14px">
+        <div style="padding:10px 0;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--bdr)"><span style="color:var(--acc)">✓</span><span style="font-size:13px;color:var(--txt)">Unlimited AI image generations</span></div>
+        <div style="padding:10px 0;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--bdr)"><span style="color:var(--acc)">✓</span><span style="font-size:13px;color:var(--txt)">Upload unlimited reference images</span></div>
+        <div style="padding:10px 0;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--bdr)"><span style="color:var(--acc)">✓</span><span style="font-size:13px;color:var(--txt)">4K print-quality downloads</span></div>
+        <div style="padding:10px 0;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--bdr)"><span style="color:var(--acc)">✓</span><span style="font-size:13px;color:var(--txt)">Priority AI generation queue</span></div>
+        <div style="padding:10px 0;display:flex;align-items:center;gap:10px"><span style="color:var(--acc)">✓</span><span style="font-size:13px;color:var(--txt)">Commercial use licence</span></div>
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:14px">
+        <div style="flex:1;background:var(--card);border:1.5px solid var(--bdr);border-radius:16px;padding:14px 8px;text-align:center;cursor:pointer"><div style="font-size:9px;color:var(--txt2);font-weight:700;margin-bottom:3px">MONTHLY</div><div style="font-family:'Syne';font-size:19px;font-weight:800;color:var(--txt)">€4.99</div><div style="font-size:10px;color:var(--txt2);margin-top:2px">per month</div><div style="font-size:10px;color:var(--txt2);margin-top:5px;padding-top:5px;border-top:1px solid var(--bdr)">∞ unlimited</div></div>
+        <div style="flex:1;background:var(--card);border:1.5px solid var(--acc);border-radius:16px;padding:14px 8px;text-align:center;cursor:pointer"><div style="font-size:9px;color:var(--acc);font-weight:700;margin-bottom:3px">⭐ BEST VALUE</div><div style="font-family:'Syne';font-size:19px;font-weight:800;color:var(--acc)">€2.99</div><div style="font-size:10px;color:var(--txt2);margin-top:2px">per month</div><div style="font-size:10px;color:var(--txt2);margin-top:5px;padding-top:5px;border-top:1px solid var(--bdr)">Yearly · save 40%</div></div>
+        <div style="flex:1;background:var(--card);border:1.5px solid var(--bdr);border-radius:16px;padding:14px 8px;text-align:center;cursor:pointer"><div style="font-size:9px;color:var(--txt2);font-weight:700;margin-bottom:3px">ONE-TIME</div><div style="font-family:'Syne';font-size:19px;font-weight:800;color:var(--txt)">€9.99</div><div style="font-size:10px;color:var(--txt2);margin-top:2px">50 credits</div><div style="font-size:10px;color:var(--txt2);margin-top:5px;padding-top:5px;border-top:1px solid var(--bdr)">No sub needed</div></div>
+      </div>
+      <button class="pa" onclick="go('s0')" style="margin-bottom:8px">Start Unlimited Plan ⭐</button>
+      <div style="text-align:center;font-size:11px;color:var(--txt2)">Cancel anytime · Secure · No hidden fees</div>
+    </div>
+  </div>
+
+  <!-- S_PAY: PAYMENT -->
+  <div class="screen" id="s_pay">
+    <div class="sbar"><span class="bk" onclick="go('s4')">‹</span><span style="font-family:'Syne';font-size:14px;font-weight:700;color:var(--txt)">Checkout</span><span></span></div>
+    <div class="sbody" style="padding:10px 16px 24px">
+      <div class="cd" style="margin-bottom:12px">
+        <div style="font-size:10px;color:var(--txt2);margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px">Order Summary</div>
+        <div class="row"><span style="font-size:13px;color:var(--txt)">Cyber Wolf · Black L</span><span style="font-size:13px;color:var(--txt)">€24.99</span></div>
+        <div class="row"><span style="font-size:13px;color:var(--txt2)">Machine fee</span><span style="font-size:12px;color:#3ECC7A">Free</span></div>
+        <div style="height:1px;background:var(--bdr);margin:4px 0 10px"></div>
+        <div style="display:flex;justify-content:space-between"><span style="font-size:14px;font-weight:600;color:var(--txt)">Total</span><span style="font-family:'Syne';font-size:18px;font-weight:800;color:var(--txt)">€24.99</span></div>
+      </div>
+      <div style="margin-bottom:10px"><div style="font-size:11px;color:var(--txt2);margin-bottom:6px">Card number</div><input class="fi" value="4242 4242 4242 4242"/></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+        <div><div style="font-size:11px;color:var(--txt2);margin-bottom:6px">Expiry</div><input class="fi" value="12/27"/></div>
+        <div><div style="font-size:11px;color:var(--txt2);margin-bottom:6px">CVC</div><input class="fi" value="123"/></div>
+      </div>
+      <button class="pa" onclick="go('s_done')" style="margin-bottom:10px">Pay €24.99</button>
+      <div style="display:flex;align-items:center;gap:10px;margin:8px 0"><div style="flex:1;height:1px;background:var(--bdr)"></div><span style="font-size:11px;color:var(--txt2)">or</span><div style="flex:1;height:1px;background:var(--bdr)"></div></div>
+      <button onclick="go('s_done')" style="width:100%;padding:13px;background:#003087;border:none;border-radius:14px;color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:'DM Sans';margin-bottom:12px">Pay with PayPal</button>
+      <div style="text-align:center;font-size:11px;color:var(--txt2)">🔒 Secured by Stripe · SSL encrypted</div>
+    </div>
+  </div>
+
+  <!-- S_DONE: CONFIRMED -->
+  <div class="screen" id="s_done">
+    <div class="sbar"><span></span><span></span><span></span></div>
+    <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center">
+      <div style="width:76px;height:76px;background:rgba(62,204,122,.1);border:1.5px solid rgba(62,204,122,.3);border-radius:24px;display:flex;align-items:center;justify-content:center;margin-bottom:20px">
+        <svg width="34" height="34" viewBox="0 0 34 34" fill="none"><polyline points="5,17 13,25 29,9" stroke="#3ECC7A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div style="font-family:'Syne';font-size:22px;font-weight:800;color:var(--txt);margin-bottom:6px">All Done!</div>
+      <div style="font-size:13px;color:var(--txt2);margin-bottom:24px">Payment confirmed · Printing now</div>
+      <div style="width:100%;margin-bottom:8px"><div style="display:flex;justify-content:space-between;margin-bottom:7px"><span style="font-size:12px;color:var(--txt2)">Printing...</span><span style="font-size:12px;color:var(--acc);font-weight:600">65%</span></div><div style="height:6px;background:var(--bg3);border-radius:100px;overflow:hidden"><div style="width:65%;height:100%;background:var(--acc);border-radius:100px"></div></div></div>
+      <div style="font-size:12px;color:var(--txt2);margin-bottom:24px">Est. 1–2 minutes</div>
+      <div class="cd" style="width:100%;text-align:left;margin-bottom:24px">
+        <div class="row"><span style="font-size:12px;color:var(--txt2)">Machine</span><span style="font-size:12px;color:var(--txt)">PrintStation #07</span></div>
+        <div class="row"><span style="font-size:12px;color:var(--txt2)">Order ID</span><span style="font-size:12px;color:var(--txt)">#TA-2025-4491</span></div>
+        <div class="row" style="margin-bottom:0"><span style="font-size:12px;color:var(--txt2)">Paid</span><span style="font-size:12px;color:#3ECC7A">€24.99 ✓</span></div>
+      </div>
+      <button class="pa" onclick="go('s0')" style="width:100%">Back to Home</button>
+    </div>
+  </div>
+
+  <!-- S9: PROFILE -->
+  <div class="screen" id="s9">
+    <div class="sbar"><span class="bk" onclick="go('s0')">‹</span><span style="font-family:'Syne';font-size:14px;font-weight:700;color:var(--txt)">Profile</span><span style="font-size:12px;color:var(--txt2)">Edit</span></div>
+    <div class="sbody">
+      <div style="padding:16px;text-align:center">
+        <div style="width:64px;height:64px;background:var(--acc);border-radius:50%;margin:0 auto 10px;display:flex;align-items:center;justify-content:center;font-family:'Syne';font-size:24px;font-weight:800;color:#000">T</div>
+        <div style="font-family:'Syne';font-size:18px;font-weight:800;color:var(--txt)">Timotej</div>
+        <div style="font-size:12px;color:var(--txt2);margin-top:3px;margin-bottom:10px">Free Plan · 3 credits used</div>
+        <button onclick="go('s7')" style="background:var(--acc);border:none;border-radius:10px;padding:7px 20px;font-family:'Syne';font-size:12px;font-weight:700;cursor:pointer">Upgrade to Pro ⭐</button>
+      </div>
+      <div style="display:flex;gap:8px;padding:0 16px;margin-bottom:14px">
+        <div style="flex:1;background:var(--card);border:1px solid var(--bdr);border-radius:13px;padding:12px;text-align:center"><div style="font-family:'Syne';font-size:20px;font-weight:800;color:var(--txt)">3</div><div style="font-size:10px;color:var(--txt2);margin-top:2px">Designs</div></div>
+        <div style="flex:1;background:var(--card);border:1px solid var(--bdr);border-radius:13px;padding:12px;text-align:center"><div style="font-family:'Syne';font-size:20px;font-weight:800;color:var(--txt)">2</div><div style="font-size:10px;color:var(--txt2);margin-top:2px">Prints</div></div>
+        <div style="flex:1;background:var(--card);border:1px solid var(--bdr);border-radius:13px;padding:12px;text-align:center"><div style="font-family:'Syne';font-size:20px;font-weight:800;color:var(--txt)">1</div><div style="font-size:10px;color:var(--txt2);margin-top:2px">Orders</div></div>
+      </div>
+      <div style="margin:0 16px;background:var(--card);border:1px solid var(--bdr);border-radius:16px;overflow:hidden">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--bdr)"><div style="display:flex;align-items:center;gap:10px"><div style="width:34px;height:34px;background:rgba(200,255,0,.08);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:15px">⭐</div><span style="font-size:13px;color:var(--txt)">My Subscription</span></div><span style="color:var(--txt2)">›</span></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--bdr)"><div style="display:flex;align-items:center;gap:10px"><div style="width:34px;height:34px;background:rgba(94,139,255,.08);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:15px">📦</div><span style="font-size:13px;color:var(--txt)">Order History</span></div><span style="color:var(--txt2)">›</span></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--bdr)"><div style="display:flex;align-items:center;gap:10px"><div style="width:34px;height:34px;background:rgba(255,255,255,.04);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:15px">🔔</div><span style="font-size:13px;color:var(--txt)">Notifications</span></div><span style="color:var(--txt2)">›</span></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px"><div style="display:flex;align-items:center;gap:10px"><div style="width:34px;height:34px;background:rgba(255,94,40,.08);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:15px">→</div><span style="font-size:13px;color:var(--acc2)">Sign Out</span></div></div>
+      </div>
+      <div style="height:16px"></div>
+    </div>
+    <div class="bnav">
+      <div class="bni" onclick="go('s0')"><svg viewBox="0 0 22 22" fill="none"><path d="M3 9.5L11 3l8 6.5V19a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z" stroke="#777" stroke-width="1.6"/></svg><span>Home</span></div>
+      <div class="bni" onclick="go('s5')"><svg viewBox="0 0 22 22" fill="none"><rect x="2" y="2" width="18" height="18" rx="4" stroke="#777" stroke-width="1.6"/><path d="M2 15l5-5 4 4 3-3 8 8" stroke="#777" stroke-width="1.6"/></svg><span>Gallery</span></div>
+      <div class="bni-mid" onclick="go('s1')"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M11 4v14M4 11h14" stroke="#000" stroke-width="2.5" stroke-linecap="round"/></svg></div>
+      <div class="bni" onclick="go('s6')"><svg viewBox="0 0 22 22" fill="none"><path d="M3 3h2l2 9h10l2-6H7" stroke="#777" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="19" r="1.5" fill="#777"/><circle cx="17" cy="19" r="1.5" fill="#777"/></svg><span>Shop</span></div>
+      <div class="bni on"><svg viewBox="0 0 22 22" fill="none"><circle cx="11" cy="7" r="4" stroke="#C8FF00" stroke-width="1.6"/><path d="M3 20c0-4.4 3.6-8 8-8s8 3.6 8 8" stroke="#C8FF00" stroke-width="1.6"/></svg><span style="color:var(--acc)">Profile</span></div>
+    </div>
+  </div>
+
+</div><!-- /phone -->
+
+<div style="display:flex;align-items:center;gap:10px">
+  <button onclick="prev()" style="background:transparent;border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.35);padding:5px 12px;border-radius:8px;cursor:pointer;font-size:12px;font-family:'DM Sans'">‹ Back</button>
+  <div class="ndots" id="nd"></div>
+  <button onclick="next()" style="background:transparent;border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.35);padding:5px 12px;border-radius:8px;cursor:pointer;font-size:12px;font-family:'DM Sans'">Next ›</button>
+</div>
+<div id="slbl" style="font-size:11px;color:rgba(255,255,255,.25);font-family:'DM Sans';text-align:center"></div>
+</div>
+
+<script>
+var order=['s0','s1','s2','s_gen','s_result','s3','s4','s_pay','s_done','s5','s6','s7','s9'];
+var names=['Home','AI Studio — Text','AI Studio — Upload','Generating…','Result & Options','QR Scanner','Machine Found','Payment','Confirmed','Gallery','Online Shop','Paywall','Profile'];
+var cur=0;
+function go(id){
+  document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});
+  document.getElementById(id).classList.add('active');
+  var i=order.indexOf(id);
+  if(i>=0)cur=i;
+  if(id==='s_gen')setTimeout(function(){go('s_result');},2000);
+  rd();
+}
+function rd(){
+  var d=document.getElementById('nd');
+  d.innerHTML='';
+  order.forEach(function(_,i){
+    var dot=document.createElement('div');
+    dot.className='ndot'+(i===cur?' on':'');
+    dot.onclick=function(){go(order[i]);};
+    d.appendChild(dot);
+  });
+  document.getElementById('slbl').textContent=names[cur]+' ('+(cur+1)+'/'+order.length+')';
+}
+function next(){go(order[Math.min(cur+1,order.length-1)]);}
+function prev(){go(order[Math.max(cur-1,0)]);}
+rd();
+</script>
+</body>
+</html>

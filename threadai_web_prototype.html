@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ThreadAI Web — Prototype</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#08080C;--bg2:#0F0F16;--bg3:#16161F;--bg4:#1C1C28;
+  --acc:#C8FF00;--acc2:#FF5E28;--acc3:#5E8BFF;
+  --txt:#F0F0EC;--txt2:#666;--txt3:#333;
+  --bdr:#1E1E2A;--card:#0F0F16;
+  --sidebar:220px;
+}
+body{background:var(--bg);font-family:'DM Sans',sans-serif;color:var(--txt);min-height:100vh;display:flex;flex-direction:column}
+
+/* TOP NAV */
+.topnav{height:56px;background:rgba(8,8,12,.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--bdr);display:flex;align-items:center;justify-content:space-between;padding:0 28px;position:sticky;top:0;z-index:100;flex-shrink:0}
+.logo{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:var(--txt);display:flex;align-items:center;gap:8px;cursor:pointer}
+.logo-dot{width:8px;height:8px;background:var(--acc);border-radius:50%}
+.nav-links{display:flex;align-items:center;gap:4px}
+.nl{padding:7px 14px;border-radius:8px;font-size:13px;color:var(--txt2);cursor:pointer;transition:.15s;font-family:'DM Sans';border:none;background:transparent}
+.nl:hover{background:var(--bg3);color:var(--txt)}
+.nl.on{background:var(--bg3);color:var(--txt)}
+.nav-right{display:flex;align-items:center;gap:10px}
+.credits-pill{background:var(--bg3);border:1px solid var(--bdr);border-radius:8px;padding:5px 12px;font-size:12px;display:flex;align-items:center;gap:6px;cursor:pointer}
+.credits-pill span{font-family:'Syne',sans-serif;font-weight:700;color:var(--acc)}
+.btn-sm{padding:7px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans';border:none}
+.btn-acc{background:var(--acc);color:#000}
+.btn-ghost{background:transparent;border:1px solid var(--bdr);color:var(--txt2)}
+.avatar{width:32px;height:32px;background:var(--acc);border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:13px;font-weight:800;color:#000;cursor:pointer}
+
+/* LAYOUT */
+.app{display:flex;flex:1;min-height:0}
+.sidebar{width:var(--sidebar);background:var(--bg2);border-right:1px solid var(--bdr);padding:20px 12px;display:flex;flex-direction:column;gap:2px;flex-shrink:0}
+.si{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;font-size:13px;color:var(--txt2);cursor:pointer;transition:.15s}
+.si:hover{background:var(--bg3);color:var(--txt)}
+.si.on{background:var(--bg3);color:var(--txt)}
+.si svg{width:16px;height:16px;flex-shrink:0}
+.si-sep{height:1px;background:var(--bdr);margin:8px 0}
+.si-label{font-size:10px;color:var(--txt3);text-transform:uppercase;letter-spacing:.8px;padding:4px 12px}
+
+/* MAIN */
+.main{flex:1;overflow-y:auto;overflow-x:hidden}
+.main::-webkit-scrollbar{width:6px}
+.main::-webkit-scrollbar-track{background:transparent}
+.main::-webkit-scrollbar-thumb{background:var(--bdr);border-radius:3px}
+
+/* PAGE CONTENT */
+.page{display:none;padding:32px 36px;max-width:1100px}
+.page.on{display:block}
+
+/* HEADINGS */
+.ph{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;color:var(--txt);margin-bottom:6px}
+.ps{font-size:14px;color:var(--txt2);margin-bottom:28px}
+
+/* CARDS */
+.card{background:var(--card);border:1px solid var(--bdr);border-radius:16px;padding:20px}
+.card-sm{background:var(--card);border:1px solid var(--bdr);border-radius:12px;padding:16px}
+
+/* BUTTONS */
+.btn{padding:10px 20px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;font-family:'DM Sans';border:none;display:inline-flex;align-items:center;gap:7px;transition:.15s}
+.btn-primary{background:var(--acc);color:#000}
+.btn-primary:hover{background:#d4ff20}
+.btn-secondary{background:var(--bg3);color:var(--txt);border:1px solid var(--bdr)}
+.btn-secondary:hover{border-color:var(--txt3)}
+.btn-danger{background:rgba(255,94,40,.12);color:var(--acc2);border:1px solid rgba(255,94,40,.2)}
+.btn-lg{padding:13px 28px;font-size:15px;border-radius:12px}
+
+/* FORM */
+.label{font-size:12px;color:var(--txt2);margin-bottom:7px;text-transform:uppercase;letter-spacing:.4px}
+textarea,input[type=text],input[type=email],input[type=password]{background:var(--bg3);border:1px solid var(--bdr);border-radius:10px;padding:11px 14px;color:var(--txt);font-size:14px;font-family:'DM Sans';outline:none;width:100%;transition:.15s}
+textarea:focus,input:focus{border-color:var(--acc3)}
+textarea{resize:none}
+
+/* CHIPS */
+.chips{display:flex;flex-wrap:wrap;gap:7px}
+.chip{padding:6px 14px;border-radius:20px;font-size:12px;border:1px solid var(--bdr);color:var(--txt2);cursor:pointer;background:var(--bg3);transition:.15s}
+.chip:hover{border-color:var(--txt3);color:var(--txt)}
+.chip.on{border-color:var(--acc);color:var(--acc);background:rgba(200,255,0,.07)}
+
+/* GRID */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+
+/* STAT CARD */
+.stat{background:var(--bg2);border:1px solid var(--bdr);border-radius:12px;padding:16px 18px}
+.stat-val{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:var(--txt);margin-bottom:3px}
+.stat-lbl{font-size:12px;color:var(--txt2)}
+
+/* RESULT PREVIEW */
+.result-preview{background:var(--bg3);border:1px solid var(--bdr);border-radius:16px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+
+/* TABS */
+.tabs{display:flex;background:var(--bg3);border-radius:12px;padding:3px;gap:0;margin-bottom:20px;width:fit-content}
+.tab{padding:8px 18px;border-radius:9px;font-size:13px;font-weight:600;cursor:pointer;color:var(--txt2);transition:.18s;font-family:'DM Sans';border:none;background:transparent}
+.tab.on{background:var(--txt);color:#000}
+
+/* TABLE */
+table.data{width:100%;border-collapse:collapse}
+table.data th{text-align:left;padding:10px 14px;font-size:12px;color:var(--txt2);border-bottom:1px solid var(--bdr);font-weight:500}
+table.data td{padding:12px 14px;font-size:13px;border-bottom:1px solid var(--bdr)}
+table.data tr:last-child td{border-bottom:none}
+table.data tr:hover td{background:var(--bg3)}
+
+/* BADGE */
+.badge{padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600}
+.badge-green{background:rgba(62,204,122,.12);color:#3ECC7A}
+.badge-orange{background:rgba(255,94,40,.12);color:var(--acc2)}
+.badge-blue{background:rgba(94,139,255,.12);color:var(--acc3)}
+.badge-acc{background:rgba(200,255,0,.12);color:var(--acc)}
+
+/* PROGRESS */
+.prog-bar{height:6px;background:var(--bg3);border-radius:100px;overflow:hidden}
+.prog-fill{height:100%;background:var(--acc);border-radius:100px}
+
+/* TOOLTIP/NOTE */
+.info-box{background:rgba(94,139,255,.06);border:1px solid rgba(94,139,255,.18);border-radius:12px;padding:14px 16px;font-size:13px;color:var(--txt2);display:flex;align-items:flex-start;gap:10px}
+.warn-box{background:rgba(255,94,40,.06);border:1px solid rgba(255,94,40,.18);border-radius:12px;padding:14px 16px;font-size:13px;color:var(--txt2)}
+
+/* GALLERY GRID */
+.gal-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.gal-item{border-radius:12px;overflow:hidden;position:relative;cursor:pointer;aspect-ratio:1}
+.gal-item .gi-img{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:40px}
+.gal-item .gi-overlay{position:absolute;inset:0;background:rgba(0,0,0,0);transition:.2s;display:flex;align-items:flex-end;padding:10px}
+.gal-item:hover .gi-overlay{background:rgba(0,0,0,.6)}
+.gal-item .gi-actions{opacity:0;transition:.2s;display:flex;gap:6px}
+.gal-item:hover .gi-actions{opacity:1}
+
+/* SHOP */
+.product-card{background:var(--card);border:1px solid var(--bdr);border-radius:16px;overflow:hidden;cursor:pointer;transition:.2s}
+.product-card:hover{border-color:var(--acc3)}
+
+/* PAYWALL MODAL */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(6px);z-index:200;display:none;align-items:center;justify-content:center}
+.modal-bg.on{display:flex}
+.modal{background:var(--bg2);border:1px solid var(--bdr);border-radius:20px;padding:32px;width:500px;max-width:95vw}
+
+/* GENERATION LOADING */
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulse{0%,100%{opacity:.3;transform:scale(.8)}50%{opacity:1;transform:scale(1)}}
+@keyframes prog{0%{width:15%}100%{width:92%}}
+
+/* DIVIDERS */
+.divider{height:1px;background:var(--bdr);margin:24px 0}
+</style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<div class="topnav">
+  <div class="logo" onclick="showPage('dashboard')"><div class="logo-dot"></div>ThreadAI</div>
+  <div class="nav-links">
+    <button class="nl on" onclick="showPage('dashboard')">Home</button>
+    <button class="nl" onclick="showPage('generate')">AI Studio</button>
+    <button class="nl" onclick="showPage('shop')">Shop</button>
+    <button class="nl" onclick="showPage('gallery')">Gallery</button>
+    <button class="nl" onclick="showPage('pricing')">Pricing</button>
+  </div>
+  <div class="nav-right">
+    <div class="credits-pill" onclick="showModal()">
+      <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><polygon points="6,1 7.5,4.5 11,5 8.5,7.5 9,11 6,9 3,11 3.5,7.5 1,5 4.5,4.5" fill="#C8FF00"/></svg>
+      <span>3</span><span style="color:var(--txt2);font-size:12px">credits left</span>
+    </div>
+    <button class="btn-sm btn-ghost" onclick="showPage('pricing')">Upgrade</button>
+    <div class="avatar" onclick="showPage('account')">T</div>
+  </div>
+</div>
+
+<div class="app">
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="si on" onclick="showPage('dashboard')"><svg viewBox="0 0 16 16" fill="none"><path d="M2 7L8 2l6 5v7a.8.8 0 0 1-.8.8H2.8A.8.8 0 0 1 2 14z" stroke="currentColor" stroke-width="1.5"/></svg>Dashboard</div>
+  <div class="si" onclick="showPage('generate')"><svg viewBox="0 0 16 16" fill="none"><polygon points="8,1 10,6 15,6.5 11,10 12.5,15 8,12.5 3.5,15 5,10 1,6.5 6,6" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>AI Studio</div>
+  <div class="si" onclick="showPage('gallery')"><svg viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="14" height="14" rx="3" stroke="currentColor" stroke-width="1.4"/><path d="M1 11l4-4 3 3 2-2 6 6" stroke="currentColor" stroke-width="1.4"/></svg>My Gallery</div>
+  <div class="si-sep"></div>
+  <div class="si-label">Shop</div>
+  <div class="si" onclick="showPage('shop')"><svg viewBox="0 0 16 16" fill="none"><path d="M2 2h2l1.5 7h7l1.5-5H6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="7" cy="14" r="1.2" fill="currentColor"/><circle cx="13" cy="14" r="1.2" fill="currentColor"/></svg>Browse Shop</div>
+  <div class="si" onclick="showPage('orders')"><svg viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="11" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M5 3V2.5a3 3 0 0 1 6 0V3" stroke="currentColor" stroke-width="1.4"/></svg>My Orders</div>
+  <div class="si-sep"></div>
+  <div class="si-label">Account</div>
+  <div class="si" onclick="showPage('pricing')"><svg viewBox="0 0 16 16" fill="none"><polygon points="8,1 10,6 15,6.5 11,10 12.5,15 8,12.5 3.5,15 5,10 1,6.5 6,6" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>Pricing</div>
+  <div class="si" onclick="showPage('account')"><svg viewBox="0 0 16 16" fill="none"><circle cx="8" cy="5.5" r="3" stroke="currentColor" stroke-width="1.4"/><path d="M2 15c0-3.3 2.7-6 6-6s6 2.7 6 6" stroke="currentColor" stroke-width="1.4"/></svg>Account</div>
+  <div style="flex:1"></div>
+  <div class="warn-box" style="padding:12px;font-size:11px">
+    <div style="color:var(--acc);font-weight:600;margin-bottom:4px">⭐ 3 free credits left</div>
+    <div style="color:var(--txt2)">Upgrade for unlimited generations</div>
+    <button class="btn btn-primary" style="margin-top:10px;padding:7px 14px;font-size:12px;width:100%;justify-content:center" onclick="showModal()">Upgrade now</button>
+  </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="main" id="main">
+
+  <!-- DASHBOARD -->
+  <div class="page on" id="p-dashboard">
+    <div class="ph">Good afternoon, Timotej 👋</div>
+    <div class="ps">Welcome to ThreadAI — your AI-powered t-shirt design studio.</div>
+    <div class="g4" style="margin-bottom:28px">
+      <div class="stat"><div class="stat-val">3</div><div class="stat-lbl">Designs made</div></div>
+      <div class="stat"><div class="stat-val" style="color:var(--acc)">3</div><div class="stat-lbl">Free credits left</div></div>
+      <div class="stat"><div class="stat-val">2</div><div class="stat-lbl">Orders placed</div></div>
+      <div class="stat"><div class="stat-val">€54</div><div class="stat-lbl">Total spent</div></div>
+    </div>
+    <!-- QUICK ACTIONS -->
+    <div style="margin-bottom:28px">
+      <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:14px">Quick Actions</div>
+      <div class="g3">
+        <div onclick="showPage('generate')" style="background:var(--bg3);border:1px solid var(--bdr);border-radius:14px;padding:20px;cursor:pointer;transition:.15s" onmouseover="this.style.borderColor='var(--acc)'" onmouseout="this.style.borderColor='var(--bdr)'">
+          <div style="font-size:28px;margin-bottom:10px">✦</div>
+          <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--acc);margin-bottom:4px">Text to Image</div>
+          <div style="font-size:12px;color:var(--txt2)">Type a prompt, get a design in seconds</div>
+        </div>
+        <div onclick="showPage('generate')" style="background:var(--bg3);border:1px solid var(--bdr);border-radius:14px;padding:20px;cursor:pointer;transition:.15s" onmouseover="this.style.borderColor='var(--acc2)'" onmouseout="this.style.borderColor='var(--bdr)'">
+          <div style="font-size:28px;margin-bottom:10px">↑</div>
+          <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--acc2);margin-bottom:4px">Upload Reference</div>
+          <div style="font-size:12px;color:var(--txt2)">Upload your own image and transform it</div>
+        </div>
+        <div onclick="showPage('shop')" style="background:var(--bg3);border:1px solid var(--bdr);border-radius:14px;padding:20px;cursor:pointer;transition:.15s" onmouseover="this.style.borderColor='var(--acc3)'" onmouseout="this.style.borderColor='var(--bdr)'">
+          <div style="font-size:28px;margin-bottom:10px">🛒</div>
+          <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--acc3);margin-bottom:4px">Order a Shirt</div>
+          <div style="font-size:12px;color:var(--txt2)">Print your design and ship it to you</div>
+        </div>
+      </div>
+    </div>
+    <!-- RECENT -->
+    <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:14px">Recent Designs</div>
+    <div class="gal-grid" style="grid-template-columns:repeat(4,1fr)">
+      <div class="gal-item" onclick="showPage('generate')"><div class="gi-img" style="background:linear-gradient(135deg,#0d0020,#20000d)">🐺</div><div class="gi-overlay"><div class="gi-actions"><button class="btn btn-primary" style="padding:5px 10px;font-size:11px">Order</button><button class="btn btn-secondary" style="padding:5px 10px;font-size:11px">⬇</button></div></div></div>
+      <div class="gal-item" onclick="showPage('generate')"><div class="gi-img" style="background:linear-gradient(135deg,#001020,#100020)">🌊</div><div class="gi-overlay"><div class="gi-actions"><button class="btn btn-primary" style="padding:5px 10px;font-size:11px">Order</button><button class="btn btn-secondary" style="padding:5px 10px;font-size:11px">⬇</button></div></div></div>
+      <div class="gal-item" onclick="showPage('generate')"><div class="gi-img" style="background:linear-gradient(135deg,#001a0d,#1a000d)">🌺</div><div class="gi-overlay"><div class="gi-actions"><button class="btn btn-primary" style="padding:5px 10px;font-size:11px">Order</button><button class="btn btn-secondary" style="padding:5px 10px;font-size:11px">⬇</button></div></div></div>
+      <div onclick="showPage('generate')" style="border:1.5px dashed var(--bdr);border-radius:12px;aspect-ratio:1;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.15s" onmouseover="this.style.borderColor='var(--txt3)'" onmouseout="this.style.borderColor='var(--bdr)'"><div style="text-align:center;color:var(--txt3)"><div style="font-size:28px;margin-bottom:6px">+</div><div style="font-size:12px">New design</div></div></div>
+    </div>
+  </div>
+
+  <!-- AI STUDIO -->
+  <div class="page" id="p-generate">
+    <div class="ph">AI Studio</div>
+    <div class="ps">Generate a custom t-shirt design in seconds.</div>
+    <div style="display:grid;grid-template-columns:1fr 420px;gap:24px;align-items:start">
+      <!-- LEFT: CONTROLS -->
+      <div>
+        <div class="tabs">
+          <button class="tab on">✦ Text to Image</button>
+          <button class="tab" onclick="showUploadTab()">↑ Upload Reference</button>
+        </div>
+        <div id="text-tab">
+          <div style="margin-bottom:16px">
+            <div class="label">Prompt</div>
+            <textarea rows="5" placeholder="Describe your design... e.g. 'A fierce wolf howling at a neon moon, cyberpunk style, dark background, ultra detailed'">A fierce wolf howling at a neon moon, cyberpunk style, dark background, ultra detailed illustration</textarea>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
+              <span style="font-size:12px;color:var(--txt2)">Be specific — colours, style, mood, subject</span>
+              <button class="btn btn-secondary" style="padding:5px 12px;font-size:12px">🎲 Random</button>
+            </div>
+          </div>
+          <div style="margin-bottom:16px"><div class="label">Art Style</div><div class="chips"><div class="chip on">Illustration</div><div class="chip">Photorealistic</div><div class="chip">Watercolour</div><div class="chip">Neon Glow</div><div class="chip">Anime</div><div class="chip">Vintage</div><div class="chip">Baroque</div><div class="chip">Cyberpunk</div></div></div>
+          <div class="g2" style="margin-bottom:16px">
+            <div><div class="label">Colour Mood</div><div class="chips"><div class="chip on">Dark</div><div class="chip">Vibrant</div><div class="chip">Pastel</div><div class="chip">Monochrome</div></div></div>
+            <div><div class="label">Aspect Ratio</div><div class="chips"><div class="chip on">1:1 Square</div><div class="chip">4:5 Portrait</div><div class="chip">16:9 Wide</div></div></div>
+          </div>
+          <div style="margin-bottom:20px"><div class="label">Quality</div><div class="chips"><div class="chip on">Standard</div><div class="chip">High Quality <span class="badge badge-acc">Pro</span></div><div class="chip">4K Ultra <span class="badge badge-acc">Pro</span></div></div></div>
+          <button class="btn btn-primary btn-lg" onclick="showPage('p-generating')" style="width:100%;justify-content:center">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><polygon points="8,1 10,6 15,6.5 11,10 12.5,15 8,12.5 3.5,15 5,10 1,6.5 6,6" fill="#000"/></svg>
+            Generate Design — 1 credit
+          </button>
+          <div style="text-align:center;margin-top:8px;font-size:12px;color:var(--txt2)">2 free credits remaining after this</div>
+        </div>
+        <div id="upload-tab" style="display:none">
+          <div style="border:1.5px dashed var(--bdr);border-radius:14px;padding:36px;text-align:center;cursor:pointer;margin-bottom:16px" onmouseover="this.style.borderColor='var(--acc)'" onmouseout="this.style.borderColor='var(--bdr)'">
+            <svg width="36" height="36" viewBox="0 0 36 36" fill="none" style="display:block;margin:0 auto 10px"><rect x="3" y="7" width="30" height="22" rx="5" stroke="#C8FF00" stroke-width="2"/><path d="M18 13v10M13 18l5-5 5 5" stroke="#C8FF00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <div style="font-size:14px;color:var(--txt2)">Drop your image here or <span style="color:var(--acc);cursor:pointer">browse files</span></div>
+            <div style="font-size:12px;color:var(--txt3);margin-top:6px">JPG, PNG, WebP up to 20MB</div>
+          </div>
+          <div class="card-sm" style="display:flex;align-items:center;gap:12px;margin-bottom:16px;border-color:rgba(200,255,0,.2)">
+            <div style="width:52px;height:52px;background:linear-gradient(135deg,#0d0020,#20000d);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0">🖼</div>
+            <div style="flex:1"><div style="font-size:14px;color:var(--txt);font-weight:500">my_logo.png</div><div style="font-size:12px;color:var(--txt2)">2.4 MB · Ready to process</div></div>
+            <div style="color:var(--acc);font-size:20px">✓</div>
+          </div>
+          <div style="margin-bottom:16px"><div class="label">Prompt (optional)</div><textarea rows="3" placeholder="Describe modifications... e.g. 'Apply watercolour effect, warm tones'">Apply cyberpunk neon glow effect, keep the original composition</textarea></div>
+          <div class="g2" style="margin-bottom:16px">
+            <div><div class="label">Strength</div><div class="chips"><div class="chip">Subtle</div><div class="chip on">Medium</div><div class="chip">Strong</div></div></div>
+            <div><div class="label">Art Style</div><div class="chips"><div class="chip">Keep</div><div class="chip on">Cyberpunk</div><div class="chip">Anime</div></div></div>
+          </div>
+          <button class="btn btn-primary btn-lg" onclick="showPage('p-generating')" style="width:100%;justify-content:center">✦ Generate Design — 1 credit</button>
+        </div>
+      </div>
+      <!-- RIGHT: PREVIEW PANEL -->
+      <div>
+        <div class="label">Preview</div>
+        <div class="result-preview" style="height:340px;margin-bottom:14px">
+          <div style="text-align:center;opacity:.25">
+            <svg width="48" height="48" viewBox="0 0 48 48" fill="none" style="display:block;margin:0 auto 10px"><polygon points="24,4 29,18 44,18 32,27 37,41 24,32 11,41 16,27 4,18 19,18" stroke="#C8FF00" stroke-width="2" stroke-linejoin="round"/></svg>
+            <div style="font-size:13px;color:var(--txt2)">Your design will appear here</div>
+          </div>
+        </div>
+        <!-- RECENT PROMPTS -->
+        <div class="label">Recent Prompts</div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <div style="background:var(--bg3);border:1px solid var(--bdr);border-radius:10px;padding:10px 12px;font-size:12px;color:var(--txt2);cursor:pointer" onclick="">🐺 Cyber wolf, neon, dark background...</div>
+          <div style="background:var(--bg3);border:1px solid var(--bdr);border-radius:10px;padding:10px 12px;font-size:12px;color:var(--txt2);cursor:pointer">🌊 Ocean waves, Japanese woodblock style...</div>
+          <div style="background:var(--bg3);border:1px solid var(--bdr);border-radius:10px;padding:10px 12px;font-size:12px;color:var(--txt2);cursor:pointer">🌺 Vintage floral botanica, muted tones...</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GENERATING -->
+  <div class="page" id="p-generating">
+    <div style="max-width:520px;margin:60px auto;text-align:center">
+      <div style="width:96px;height:96px;border-radius:28px;background:var(--bg3);border:1px solid var(--bdr);display:flex;align-items:center;justify-content:center;margin:0 auto 24px;position:relative;overflow:hidden">
+        <div style="position:absolute;inset:0;background:conic-gradient(var(--acc) 0deg,transparent 80deg);animation:spin .9s linear infinite;opacity:.2"></div>
+        <svg width="40" height="40" viewBox="0 0 40 40" fill="none"><polygon points="20,2 24,14 36,14 27,21 31,33 20,26 9,33 13,21 4,14 16,14" fill="#C8FF00"/></svg>
+      </div>
+      <div style="font-family:'Syne',sans-serif;font-size:28px;font-weight:800;margin-bottom:10px">Generating your design...</div>
+      <div style="font-size:14px;color:var(--txt2);margin-bottom:32px">AI is creating your unique t-shirt artwork. Usually 5–15 seconds.</div>
+      <div class="prog-bar" style="margin-bottom:10px"><div class="prog-fill" style="animation:prog 3s ease infinite alternate"></div></div>
+      <div style="font-size:12px;color:var(--txt2);margin-bottom:40px">Processing prompt · Generating image · Optimising for print</div>
+      <button onclick="showPage('p-result')" class="btn btn-secondary">Preview result →</button>
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div class="page" id="p-result">
+    <div style="display:grid;grid-template-columns:1fr 380px;gap:28px;align-items:start">
+      <div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+          <div><div class="ph" style="margin-bottom:2px">Your Design</div><div style="font-size:13px;color:var(--txt2)">Generated successfully · Cyber Wolf · Illustration · Dark</div></div>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-secondary" onclick="showPage('generate')">↺ Regenerate</button>
+            <button class="btn btn-secondary">Share ↗</button>
+          </div>
+        </div>
+        <div class="result-preview" style="height:420px;margin-bottom:16px">
+          <div style="text-align:center">
+            <div style="font-size:100px;margin-bottom:8px">🐺</div>
+            <div style="font-size:13px;color:rgba(200,255,0,.4);font-family:'Syne'">Cyber Wolf · AI Generated</div>
+          </div>
+          <div style="position:absolute;top:12px;right:12px"><span class="badge badge-acc">AI Generated</span></div>
+        </div>
+        <!-- SHIRT PREVIEW SWATCHES -->
+        <div class="label">Preview on shirt</div>
+        <div style="display:flex;gap:10px;margin-top:8px">
+          <div style="background:#111;border:2px solid var(--acc);border-radius:10px;padding:12px 18px;cursor:pointer;text-align:center"><div style="font-size:22px">👕</div><div style="font-size:10px;color:var(--txt2);margin-top:4px">Black</div></div>
+          <div style="background:var(--bg3);border:1px solid var(--bdr);border-radius:10px;padding:12px 18px;cursor:pointer;text-align:center"><div style="font-size:22px;filter:invert(.9)">👕</div><div style="font-size:10px;color:var(--txt2);margin-top:4px">White</div></div>
+          <div style="background:var(--bg3);border:1px solid var(--bdr);border-radius:10px;padding:12px 18px;cursor:pointer;text-align:center"><div style="font-size:22px">👕</div><div style="font-size:10px;color:var(--acc3);margin-top:4px">Navy</div></div>
+        </div>
+      </div>
+      <!-- RIGHT PANEL -->
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div class="card">
+          <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:14px">What next?</div>
+          <button class="btn btn-primary" style="width:100%;justify-content:center;margin-bottom:10px" onclick="showPage('shop')">🛒 Order as a T-Shirt</button>
+          <button class="btn btn-secondary" style="width:100%;justify-content:center;margin-bottom:10px">⬇ Download PNG (4K)</button>
+          <button class="btn btn-secondary" style="width:100%;justify-content:center">+ Save to Gallery</button>
+        </div>
+        <div class="card">
+          <div class="label" style="margin-bottom:10px">Prompt Used</div>
+          <div style="font-size:13px;color:var(--txt2);line-height:1.6;background:var(--bg3);border-radius:10px;padding:12px">A fierce wolf howling at a neon moon, cyberpunk style, dark background, ultra detailed illustration</div>
+        </div>
+        <div class="info-box">
+          <div>
+            <div style="font-size:13px;color:var(--acc);font-weight:600;margin-bottom:4px">⭐ 2 credits remaining</div>
+            <div style="font-size:12px">Upgrade for unlimited generations and 4K quality</div>
+            <button class="btn" style="background:var(--acc);color:#000;padding:6px 14px;font-size:12px;margin-top:10px" onclick="showModal()">Upgrade now</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GALLERY -->
+  <div class="page" id="p-gallery">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+      <div class="ph" style="margin-bottom:0">My Gallery</div>
+      <button class="btn btn-primary" onclick="showPage('generate')">+ New Design</button>
+    </div>
+    <div class="ps">All your AI-generated and uploaded designs.</div>
+    <div style="display:flex;gap:8px;margin-bottom:20px">
+      <div class="chip on">All (6)</div>
+      <div class="chip">Text to Image</div>
+      <div class="chip">Uploaded</div>
+      <div class="chip">Ordered</div>
+    </div>
+    <div class="gal-grid">
+      <div class="gal-item" onclick="showPage('p-result')"><div class="gi-img" style="background:linear-gradient(135deg,#0d0020,#20000d)">🐺</div><div class="gi-overlay"><div class="gi-actions"><button class="btn btn-primary" style="padding:5px 10px;font-size:11px" onclick="showPage('shop')">Order</button><button class="btn btn-secondary" style="padding:5px 10px;font-size:11px">⬇</button></div></div></div>
+      <div class="gal-item"><div class="gi-img" style="background:linear-gradient(135deg,#001020,#100020)">🌊</div><div class="gi-overlay"><div class="gi-actions"><button class="btn btn-primary" style="padding:5px 10px;font-size:11px">Order</button><button class="btn btn-secondary" style="padding:5px 10px;font-size:11px">⬇</button></div></div></div>
+      <div class="gal-item"><div class="gi-img" style="background:linear-gradient(135deg,#001a0d,#1a000d)">🌺</div><div class="gi-overlay"><div class="gi-actions"><button class="btn btn-primary" style="padding:5px 10px;font-size:11px">Order</button><button class="btn btn-secondary" style="padding:5px 10px;font-size:11px">⬇</button></div></div></div>
+      <div class="gal-item"><div class="gi-img" style="background:linear-gradient(135deg,#0d1a00,#1a0d00)">🐉</div><div class="gi-overlay"><div class="gi-actions"><button class="btn btn-primary" style="padding:5px 10px;font-size:11px">Order</button><button class="btn btn-secondary" style="padding:5px 10px;font-size:11px">⬇</button></div></div></div>
+      <div class="gal-item"><div class="gi-img" style="background:linear-gradient(135deg,#0d0d1a,#1a0d0d)">⚡</div><div class="gi-overlay"><div class="gi-actions"><button class="btn btn-primary" style="padding:5px 10px;font-size:11px">Order</button><button class="btn btn-secondary" style="padding:5px 10px;font-size:11px">⬇</button></div></div></div>
+      <div onclick="showPage('generate')" style="border:1.5px dashed var(--bdr);border-radius:12px;aspect-ratio:1;display:flex;align-items:center;justify-content:center;cursor:pointer" onmouseover="this.style.borderColor='var(--txt3)'" onmouseout="this.style.borderColor='var(--bdr)'"><div style="text-align:center;color:var(--txt3)"><div style="font-size:32px;margin-bottom:8px">+</div><div style="font-size:12px">Generate new</div></div></div>
+    </div>
+  </div>
+
+  <!-- SHOP -->
+  <div class="page" id="p-shop">
+    <div class="ph">Order a T-Shirt</div>
+    <div class="ps">Choose your design, configure your shirt and we'll ship it to you.</div>
+    <div style="display:grid;grid-template-columns:1fr 360px;gap:28px;align-items:start">
+      <div>
+        <!-- DESIGN PICK -->
+        <div style="margin-bottom:20px">
+          <div class="label" style="margin-bottom:12px">Select Design</div>
+          <div style="display:flex;gap:10px">
+            <div style="background:var(--bg3);border:2px solid var(--acc);border-radius:14px;padding:14px;text-align:center;cursor:pointer;width:90px">
+              <div style="font-size:30px;margin-bottom:5px">🐺</div>
+              <div style="font-size:10px;color:var(--acc);font-weight:600">Cyber Wolf</div>
+            </div>
+            <div style="background:var(--bg3);border:1px solid var(--bdr);border-radius:14px;padding:14px;text-align:center;cursor:pointer;width:90px">
+              <div style="font-size:30px;margin-bottom:5px">🌊</div>
+              <div style="font-size:10px;color:var(--txt2)">Ocean Wave</div>
+            </div>
+            <div style="background:var(--bg3);border:1px solid var(--bdr);border-radius:14px;padding:14px;text-align:center;cursor:pointer;width:90px">
+              <div style="font-size:30px;margin-bottom:5px">🌺</div>
+              <div style="font-size:10px;color:var(--txt2)">Floral Bloom</div>
+            </div>
+            <div onclick="showPage('generate')" style="background:var(--bg3);border:1px dashed var(--bdr);border-radius:14px;padding:14px;text-align:center;cursor:pointer;width:90px;display:flex;align-items:center;justify-content:center;flex-direction:column">
+              <div style="font-size:22px;color:var(--txt3);margin-bottom:5px">+</div>
+              <div style="font-size:10px;color:var(--txt3)">New</div>
+            </div>
+          </div>
+        </div>
+        <!-- CONFIG -->
+        <div class="card" style="margin-bottom:16px">
+          <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;margin-bottom:16px">Configure</div>
+          <div style="margin-bottom:16px"><div class="label">Shirt Colour</div>
+            <div style="display:flex;gap:10px;margin-top:8px">
+              <div style="width:36px;height:36px;background:#111;border-radius:50%;border:2.5px solid var(--acc);cursor:pointer"></div>
+              <div style="width:36px;height:36px;background:#f0ede8;border-radius:50%;border:1px solid var(--bdr);cursor:pointer"></div>
+              <div style="width:36px;height:36px;background:#1a3a5c;border-radius:50%;border:1px solid var(--bdr);cursor:pointer"></div>
+              <div style="width:36px;height:36px;background:#2d1a0a;border-radius:50%;border:1px solid var(--bdr);cursor:pointer"></div>
+              <div style="width:36px;height:36px;background:#1a2d0a;border-radius:50%;border:1px solid var(--bdr);cursor:pointer"></div>
+            </div>
+          </div>
+          <div style="margin-bottom:16px"><div class="label">Size</div>
+            <div style="display:flex;gap:8px;margin-top:8px">
+              <div style="padding:8px 16px;border-radius:10px;background:var(--bg3);border:1px solid var(--bdr);font-size:13px;color:var(--txt2);cursor:pointer">XS</div>
+              <div style="padding:8px 16px;border-radius:10px;background:var(--bg3);border:1px solid var(--bdr);font-size:13px;color:var(--txt2);cursor:pointer">S</div>
+              <div style="padding:8px 16px;border-radius:10px;background:var(--acc);border:1px solid var(--acc);font-size:13px;color:#000;font-weight:600;cursor:pointer">M</div>
+              <div style="padding:8px 16px;border-radius:10px;background:var(--bg3);border:1px solid var(--bdr);font-size:13px;color:var(--txt2);cursor:pointer">L</div>
+              <div style="padding:8px 16px;border-radius:10px;background:var(--bg3);border:1px solid var(--bdr);font-size:13px;color:var(--txt2);cursor:pointer">XL</div>
+              <div style="padding:8px 16px;border-radius:10px;background:var(--bg3);border:1px solid var(--bdr);font-size:13px;color:var(--txt2);cursor:pointer">XXL</div>
+            </div>
+          </div>
+          <div><div class="label">Quantity</div>
+            <div style="display:flex;align-items:center;gap:14px;margin-top:8px">
+              <div style="width:36px;height:36px;background:var(--bg3);border:1px solid var(--bdr);border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;color:var(--txt2)">−</div>
+              <span style="font-family:'Syne',sans-serif;font-size:20px;font-weight:700">1</span>
+              <div style="width:36px;height:36px;background:var(--bg3);border:1px solid var(--bdr);border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;color:var(--txt2)">+</div>
+            </div>
+          </div>
+        </div>
+        <!-- SHIPPING -->
+        <div class="card">
+          <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;margin-bottom:14px">Shipping</div>
+          <div class="g2">
+            <div><div class="label">First Name</div><input type="text" value="Timotej" style="margin-top:6px"></div>
+            <div><div class="label">Last Name</div><input type="text" value="Tipary" style="margin-top:6px"></div>
+          </div>
+          <div style="margin-top:12px"><div class="label">Address</div><input type="text" value="Petržalka 14, Bratislava" style="margin-top:6px"></div>
+          <div class="g2" style="margin-top:12px">
+            <div><div class="label">City</div><input type="text" value="Bratislava" style="margin-top:6px"></div>
+            <div><div class="label">Country</div><input type="text" value="Slovakia" style="margin-top:6px"></div>
+          </div>
+        </div>
+      </div>
+      <!-- ORDER SUMMARY -->
+      <div style="position:sticky;top:20px">
+        <div class="card" style="margin-bottom:14px">
+          <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:16px">Order Summary</div>
+          <div style="display:flex;gap:12px;margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid var(--bdr)">
+            <div style="width:56px;height:56px;background:linear-gradient(135deg,#0d0020,#20000d);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0">🐺</div>
+            <div><div style="font-size:14px;font-weight:500;color:var(--txt)">Cyber Wolf</div><div style="font-size:12px;color:var(--txt2);margin-top:2px">Black · Size M · Qty 1</div></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-bottom:8px"><span style="font-size:13px;color:var(--txt2)">T-shirt + custom print</span><span style="font-size:13px">€29.99</span></div>
+          <div style="display:flex;justify-content:space-between;margin-bottom:12px"><span style="font-size:13px;color:var(--txt2)">Shipping (EU)</span><span style="font-size:13px;color:#3ECC7A">Free</span></div>
+          <div style="height:1px;background:var(--bdr);margin-bottom:12px"></div>
+          <div style="display:flex;justify-content:space-between;margin-bottom:20px"><span style="font-size:15px;font-weight:600">Total</span><span style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800">€29.99</span></div>
+          <button class="btn btn-primary btn-lg" style="width:100%;justify-content:center" onclick="showPage('p-checkout')">Proceed to Payment →</button>
+          <div style="text-align:center;margin-top:10px;font-size:11px;color:var(--txt2)">🔒 Secured by Stripe · Free returns within 30 days</div>
+        </div>
+        <div class="info-box"><div style="font-size:12px">🚚 <strong style="color:var(--txt)">EU delivery 3–7 business days.</strong> Printed on demand — no returns on customised items unless defective.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHECKOUT -->
+  <div class="page" id="p-checkout">
+    <div style="max-width:520px;margin:0 auto">
+      <div class="ph">Checkout</div>
+      <div class="ps">Complete your order securely.</div>
+      <div class="card" style="margin-bottom:14px">
+        <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;margin-bottom:14px">Order Summary</div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:8px"><span style="font-size:13px;color:var(--txt2)">Cyber Wolf · Black M × 1</span><span style="font-size:13px">€29.99</span></div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:12px"><span style="font-size:13px;color:var(--txt2)">Shipping</span><span style="font-size:13px;color:#3ECC7A">Free</span></div>
+        <div style="height:1px;background:var(--bdr);margin-bottom:12px"></div>
+        <div style="display:flex;justify-content:space-between"><span style="font-size:15px;font-weight:600">Total</span><span style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800">€29.99</span></div>
+      </div>
+      <div class="card" style="margin-bottom:14px">
+        <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;margin-bottom:14px">Payment</div>
+        <div style="margin-bottom:12px"><div class="label">Card Number</div><input type="text" value="4242 4242 4242 4242" style="margin-top:6px"></div>
+        <div class="g2" style="margin-bottom:14px">
+          <div><div class="label">Expiry</div><input type="text" value="12 / 27" style="margin-top:6px"></div>
+          <div><div class="label">CVC</div><input type="text" value="123" style="margin-top:6px"></div>
+        </div>
+        <button class="btn btn-primary btn-lg" style="width:100%;justify-content:center;margin-bottom:12px" onclick="showPage('p-confirmed')">Pay €29.99</button>
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px"><div style="flex:1;height:1px;background:var(--bdr)"></div><span style="font-size:12px;color:var(--txt2)">or</span><div style="flex:1;height:1px;background:var(--bdr)"></div></div>
+        <button onclick="showPage('p-confirmed')" style="width:100%;padding:13px;background:#003087;border:none;border-radius:12px;color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:'DM Sans'">Pay with PayPal</button>
+      </div>
+      <div style="text-align:center;font-size:12px;color:var(--txt2)">🔒 Secured by Stripe · SSL encrypted · PCI compliant</div>
+    </div>
+  </div>
+
+  <!-- CONFIRMED -->
+  <div class="page" id="p-confirmed">
+    <div style="max-width:480px;margin:60px auto;text-align:center">
+      <div style="width:80px;height:80px;background:rgba(62,204,122,.1);border:1.5px solid rgba(62,204,122,.3);border-radius:24px;display:flex;align-items:center;justify-content:center;margin:0 auto 24px">
+        <svg width="38" height="38" viewBox="0 0 38 38" fill="none"><polyline points="6,19 15,28 32,10" stroke="#3ECC7A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div style="font-family:'Syne',sans-serif;font-size:30px;font-weight:800;margin-bottom:10px">Order Confirmed!</div>
+      <div style="font-size:14px;color:var(--txt2);margin-bottom:32px">Your t-shirt is being printed and will ship within 2 business days.</div>
+      <div class="card" style="text-align:left;margin-bottom:24px">
+        <div style="display:flex;justify-content:space-between;margin-bottom:10px"><span style="font-size:13px;color:var(--txt2)">Order ID</span><span style="font-size:13px">#TA-2025-7731</span></div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:10px"><span style="font-size:13px;color:var(--txt2)">Design</span><span style="font-size:13px">Cyber Wolf</span></div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:10px"><span style="font-size:13px;color:var(--txt2)">Shirt</span><span style="font-size:13px">Black · Size M</span></div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:10px"><span style="font-size:13px;color:var(--txt2)">Paid</span><span style="font-size:13px;color:#3ECC7A">€29.99 ✓</span></div>
+        <div style="display:flex;justify-content:space-between"><span style="font-size:13px;color:var(--txt2)">Est. Delivery</span><span style="font-size:13px">Mar 25 – Mar 28</span></div>
+      </div>
+      <div style="display:flex;gap:10px;justify-content:center">
+        <button class="btn btn-primary" onclick="showPage('dashboard')">Back to Dashboard</button>
+        <button class="btn btn-secondary" onclick="showPage('p-orders')">View Order</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ORDERS -->
+  <div class="page" id="p-orders">
+    <div class="ph">My Orders</div>
+    <div class="ps">Track and manage your shirt orders.</div>
+    <table class="data">
+      <thead><tr><th>Design</th><th>Details</th><th>Date</th><th>Status</th><th>Total</th><th></th></tr></thead>
+      <tbody>
+        <tr><td><div style="display:flex;align-items:center;gap:10px"><div style="width:36px;height:36px;background:linear-gradient(135deg,#0d0020,#20000d);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px">🐺</div><span>Cyber Wolf</span></div></td><td style="color:var(--txt2)">Black · M · ×1</td><td style="color:var(--txt2)">Mar 20, 2025</td><td><span class="badge badge-orange">Processing</span></td><td>€29.99</td><td><button class="btn btn-secondary" style="padding:5px 12px;font-size:12px">Track</button></td></tr>
+        <tr><td><div style="display:flex;align-items:center;gap:10px"><div style="width:36px;height:36px;background:linear-gradient(135deg,#001a0d,#1a000d);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px">🌺</div><span>Floral Bloom</span></div></td><td style="color:var(--txt2)">White · S · ×1</td><td style="color:var(--txt2)">Mar 12, 2025</td><td><span class="badge badge-blue">In Transit</span></td><td>€29.99</td><td><button class="btn btn-secondary" style="padding:5px 12px;font-size:12px">Track</button></td></tr>
+        <tr><td><div style="display:flex;align-items:center;gap:10px"><div style="width:36px;height:36px;background:linear-gradient(135deg,#001020,#100020);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px">🌊</div><span>Ocean Wave</span></div></td><td style="color:var(--txt2)">Black · L · ×2</td><td style="color:var(--txt2)">Feb 28, 2025</td><td><span class="badge badge-green">Delivered</span></td><td>€54.99</td><td><button class="btn btn-secondary" style="padding:5px 12px;font-size:12px">Reorder</button></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- PRICING -->
+  <div class="page" id="p-pricing">
+    <div style="max-width:760px;margin:0 auto">
+      <div style="text-align:center;margin-bottom:36px">
+        <div class="ph">Simple, Transparent Pricing</div>
+        <div class="ps" style="margin-bottom:0">Start free. Upgrade when you need more.</div>
+      </div>
+      <div class="g3" style="margin-bottom:28px">
+        <div class="card" style="text-align:center;padding:28px 20px">
+          <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:6px">Free</div>
+          <div style="font-family:'Syne',sans-serif;font-size:36px;font-weight:800;margin-bottom:4px">€0</div>
+          <div style="font-size:12px;color:var(--txt2);margin-bottom:20px">Forever free</div>
+          <div style="display:flex;flex-direction:column;gap:8px;text-align:left;margin-bottom:20px">
+            <div style="font-size:13px;color:var(--txt)">✓ 3 AI generations total</div>
+            <div style="font-size:13px;color:var(--txt)">✓ Standard quality</div>
+            <div style="font-size:13px;color:var(--txt)">✓ PNG download</div>
+            <div style="font-size:13px;color:var(--txt2)">✗ Upload reference</div>
+            <div style="font-size:13px;color:var(--txt2)">✗ 4K quality</div>
+          </div>
+          <button class="btn btn-secondary" style="width:100%;justify-content:center">Current Plan</button>
+        </div>
+        <div class="card" style="text-align:center;padding:28px 20px;border-color:var(--acc);position:relative">
+          <div style="position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:var(--acc);color:#000;font-family:'Syne',sans-serif;font-size:11px;font-weight:700;padding:4px 14px;border-radius:20px">MOST POPULAR</div>
+          <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:6px">Pro Monthly</div>
+          <div style="font-family:'Syne',sans-serif;font-size:36px;font-weight:800;color:var(--acc);margin-bottom:4px">€4.99</div>
+          <div style="font-size:12px;color:var(--txt2);margin-bottom:20px">per month</div>
+          <div style="display:flex;flex-direction:column;gap:8px;text-align:left;margin-bottom:20px">
+            <div style="font-size:13px;color:var(--txt)">✓ Unlimited AI generations</div>
+            <div style="font-size:13px;color:var(--txt)">✓ Upload reference images</div>
+            <div style="font-size:13px;color:var(--txt)">✓ 4K print quality</div>
+            <div style="font-size:13px;color:var(--txt)">✓ Priority queue</div>
+            <div style="font-size:13px;color:var(--txt)">✓ Commercial licence</div>
+          </div>
+          <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="showModal()">Upgrade to Pro</button>
+        </div>
+        <div class="card" style="text-align:center;padding:28px 20px">
+          <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:6px">Pro Yearly</div>
+          <div style="font-family:'Syne',sans-serif;font-size:36px;font-weight:800;margin-bottom:4px">€2.99</div>
+          <div style="font-size:12px;color:var(--txt2);margin-bottom:20px">per month · billed yearly</div>
+          <div style="display:flex;flex-direction:column;gap:8px;text-align:left;margin-bottom:20px">
+            <div style="font-size:13px;color:var(--txt)">✓ Everything in Pro Monthly</div>
+            <div style="font-size:13px;color:var(--acc)">✓ Save 40% vs monthly</div>
+            <div style="font-size:13px;color:var(--acc)">✓ Early access to new styles</div>
+          </div>
+          <button class="btn btn-primary" style="width:100%;justify-content:center;background:#333;color:var(--txt)" onclick="showModal()">Best Value</button>
+        </div>
+      </div>
+      <div class="card" style="display:flex;align-items:center;justify-content:space-between;padding:20px 24px">
+        <div><div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;margin-bottom:3px">Just need a few more?</div><div style="font-size:13px;color:var(--txt2)">Buy a one-time credit pack — no subscription required</div></div>
+        <div style="display:flex;gap:10px">
+          <button class="btn btn-secondary">20 credits — €1.99</button>
+          <button class="btn btn-secondary">60 credits — €4.99</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ACCOUNT -->
+  <div class="page" id="p-account">
+    <div class="ph">Account</div>
+    <div class="ps">Manage your profile and subscription.</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;max-width:760px">
+      <div class="card">
+        <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;margin-bottom:16px">Profile</div>
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px">
+          <div style="width:52px;height:52px;background:var(--acc);border-radius:14px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:#000;flex-shrink:0">T</div>
+          <div><div style="font-size:15px;font-weight:500">Timotej Tipary</div><div style="font-size:13px;color:var(--txt2)">timotej@email.com</div></div>
+        </div>
+        <div style="margin-bottom:12px"><div class="label">Name</div><input type="text" value="Timotej Tipary" style="margin-top:6px"></div>
+        <div style="margin-bottom:16px"><div class="label">Email</div><input type="email" value="timotej@email.com" style="margin-top:6px"></div>
+        <button class="btn btn-primary">Save Changes</button>
+      </div>
+      <div class="card">
+        <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;margin-bottom:16px">Subscription</div>
+        <div style="background:var(--bg3);border-radius:12px;padding:16px;margin-bottom:14px">
+          <div style="font-size:12px;color:var(--txt2);margin-bottom:4px">Current Plan</div>
+          <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:700;margin-bottom:2px">Free</div>
+          <div style="font-size:12px;color:var(--txt2)">3 / 3 lifetime credits used</div>
+        </div>
+        <div class="prog-bar" style="margin-bottom:8px"><div class="prog-fill" style="width:100%;background:var(--acc2)"></div></div>
+        <div style="font-size:12px;color:var(--acc2);margin-bottom:16px">All free credits used</div>
+        <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="showPage('pricing')">Upgrade to Pro →</button>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /main -->
+</div><!-- /app -->
+
+<!-- PAYWALL MODAL -->
+<div class="modal-bg" id="modal" onclick="closeModal(event)">
+  <div class="modal">
+    <div style="text-align:center;margin-bottom:24px">
+      <div style="width:56px;height:56px;background:var(--acc);border-radius:16px;margin:0 auto 14px;display:flex;align-items:center;justify-content:center"><svg width="26" height="26" viewBox="0 0 26 26" fill="none"><polygon points="13,2 16,9 23,9 17.5,13.5 19.5,21 13,17 6.5,21 8.5,13.5 3,9 10,9" fill="#000"/></svg></div>
+      <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;margin-bottom:6px">Go Unlimited</div>
+      <div style="font-size:13px;color:var(--txt2)">Your free credits are used up. Upgrade to keep creating.</div>
+    </div>
+    <div style="display:flex;gap:12px;margin-bottom:20px">
+      <div style="flex:1;background:var(--bg3);border:1px solid var(--bdr);border-radius:14px;padding:16px;text-align:center">
+        <div style="font-size:11px;color:var(--txt2);font-weight:600;margin-bottom:6px">MONTHLY</div>
+        <div style="font-family:'Syne',sans-serif;font-size:26px;font-weight:800">€4.99</div>
+        <div style="font-size:11px;color:var(--txt2)">per month</div>
+      </div>
+      <div style="flex:1;background:var(--bg3);border:2px solid var(--acc);border-radius:14px;padding:16px;text-align:center;position:relative">
+        <div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:var(--acc);color:#000;font-size:10px;font-weight:700;padding:2px 10px;border-radius:20px">BEST VALUE</div>
+        <div style="font-size:11px;color:var(--acc);font-weight:600;margin-bottom:6px">YEARLY</div>
+        <div style="font-family:'Syne',sans-serif;font-size:26px;font-weight:800;color:var(--acc)">€2.99</div>
+        <div style="font-size:11px;color:var(--txt2)">per month</div>
+      </div>
+      <div style="flex:1;background:var(--bg3);border:1px solid var(--bdr);border-radius:14px;padding:16px;text-align:center">
+        <div style="font-size:11px;color:var(--txt2);font-weight:600;margin-bottom:6px">ONE-TIME</div>
+        <div style="font-family:'Syne',sans-serif;font-size:26px;font-weight:800">€9.99</div>
+        <div style="font-size:11px;color:var(--txt2)">50 credits</div>
+      </div>
+    </div>
+    <button class="btn btn-primary btn-lg" style="width:100%;justify-content:center;margin-bottom:10px" onclick="closeModal()">Start Pro Plan ⭐</button>
+    <button class="btn btn-secondary" style="width:100%;justify-content:center" onclick="closeModal()">Maybe later</button>
+  </div>
+</div>
+
+<script>
+var pageMap={'dashboard':'p-dashboard','generate':'p-generate','gallery':'p-gallery','shop':'p-shop','orders':'p-orders','pricing':'p-pricing','account':'p-account'};
+var navMap={'dashboard':0,'generate':1,'gallery':3,'shop':3,'orders':3,'pricing':4,'account':4};
+
+function showPage(id){
+  // hide all
+  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('on');});
+  document.querySelectorAll('.nl').forEach(function(n){n.classList.remove('on');});
+  document.querySelectorAll('.si').forEach(function(s){s.classList.remove('on');});
+
+  var pid = pageMap[id] || id;
+  var el = document.getElementById(pid);
+  if(!el) el = document.getElementById('p-'+id);
+  if(el) el.classList.add('on');
+
+  // scroll top
+  document.querySelector('.main').scrollTop = 0;
+
+  // generating auto-advance
+  if(pid==='p-generating') setTimeout(function(){showPage('p-result');},2200);
+}
+
+function showUploadTab(){
+  document.getElementById('text-tab').style.display='none';
+  document.getElementById('upload-tab').style.display='block';
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('on');});
+  event.target.classList.add('on');
+}
+
+function showModal(){document.getElementById('modal').classList.add('on');}
+function closeModal(e){if(!e||e.target===document.getElementById('modal')||e.currentTarget===document.getElementById('modal')){document.getElementById('modal').classList.remove('on');}}
+</script>
+</body>
+</html>
