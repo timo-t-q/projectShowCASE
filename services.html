@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moje webové služby</title>
+    
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a2a63, #b21f1f);
+            color: #f0f0f0;
+            line-height: 1.7;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            padding: 60px 0 40px;
+        }
+        
+        .header h1 {
+            font-size: 2.8rem;
+            margin-bottom: 15px;
+            background: linear-gradient(to right, #00c9ff, #92fe9d);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .header p {
+            font-size: 1.3rem;
+            opacity: 0.8;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+        
+        .service-card {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 20px;
+            padding: 35px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .service-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            border-color: rgba(0, 201, 255, 0.3);
+        }
+        
+        .service-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, #00c9ff, #92fe9d);
+        }
+        
+        .service-icon {
+            width: 80px;
+            height: 80px;
+            background: rgba(0, 201, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 25px;
+            font-size: 2.5rem;
+            color: #00c9ff;
+            border: 1px solid rgba(0, 201, 255, 0.2);
+        }
+        
+        .service-card h2 {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .service-card h2::before {
+            content: '';
+            width: 4px;
+            height: 20px;
+            background: linear-gradient(to bottom, #00c9ff, #92fe9d);
+            border-radius: 2px;
+        }
+        
+        .service-card p {
+            margin-bottom: 25px;
+            font-size: 1.1rem;
+            opacity: 0.9;
+            line-height: 1.6;
+        }
+        
+        .service-features {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 30px 0;
+        }
+        
+        .service-features li {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 0;
+            font-size: 1rem;
+            opacity: 0.85;
+        }
+        
+        .service-features li::before {
+            content: '→';
+            color: #00c9ff;
+            font-weight: bold;
+        }
+        
+        .service-btn {
+            display: inline-block;
+            background: linear-gradient(45deg, #00c9ff, #92fe9d);
+            color: #0f172a;
+            padding: 12px 28px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 201, 255, 0.3);
+        }
+        
+        .service-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 201, 255, 0.5);
+            background: linear-gradient(45deg, #00b8ff, #82f08d);
+        }
+        
+        .cta-section {
+            text-align: center;
+            padding: 60px 0;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 20px;
+            margin-top: 60px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .cta-section h2 {
+            font-size: 2.2rem;
+            margin-bottom: 25px;
+            background: linear-gradient(to right, #feca57, #ff9ff3);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .cta-section p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 700px;
+            margin: 0 auto 30px;
+        }
+        
+        .primary-btn {
+            background: linear-gradient(45deg, #ff6b6b, #feca57);
+            color: white;
+            padding: 15px 35px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+        }
+        
+        .primary-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(255, 107, 107, 0.5);
+            background: linear-gradient(45deg, #ff5252, #ffd93d);
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 40px 0 20px;
+            font-size: 0.9rem;
+            opacity: 0.6;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2.2rem;
+            }
+            
+            .header p {
+                font-size: 1.1rem;
+            }
+            
+            .services-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .service-card {
+                padding: 25px;
+            }
+            
+            .header h1 {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Moje Služby</h1>
+            <p>Profesionálne webové služby na mieru pre vaše podnikanie</p>
+        </div>
+        
+        <div class="services-grid">
+            <!-- Service 1: Web Design -->
+            <div class="service-card">
+                <div class="service-icon">🎨</div>
+                <h2>Web dizajn</h2>
+                <p>Tvorba jedinečných a vizuálne privítavých webových stránok, ktoré perfektne reprezentujú vašu značku a zaujmú vaších návštevníkov od prvého pohľadu.</p>
+                <ul class="service-features">
+                    <li>Moderný a trendy dizajn</li>
+                    <li>Prispôsobený vašej značke</li>
+                    <li>Užívateľsky priateľský UI/UX</li>
+                    <li>Responzívny dizajn pre všetky zariadenia</li>
+                    <li>Optimalizácia na rýchlosť</li>
+                </ul>
+                <a href="#" class="service-btn">Zistiť viac</a>
+            </div>
+            
+            <!-- Service 2: Web Development -->
+            <div class="service-card">
+                <div class="service-icon">💻</div>
+                <h2>Web vývoj</h2>
+                <p>Profesionálne kódovanie webových stránok a aplikácií s použitím najnovších technológií a najlepsích postupov, aby váš web bol nejen pekny, ale aj výkonný a bezpečný.</p>
+                <ul class="service-features">
+                    <li>Čistý a štruktúrovaný kód</li>
+                    <li>HTML5, CSS3, moderný JavaScript</li>
+                    <li>Responzívna implementácia</li>
+                    <li>SEO priateľská štruktúra</li>
+                    <li>Rýchle načítavanie a optimalizácia</li>
+                </ul>
+                <a href="#" class="service-btn">Zistiť viac</a>
+            </div>
+            
+            <!-- Service 3: E-commerce riešenia -->
+            <div class="service-card">
+                <div class="service-icon">🛒</div>
+                <h2>E-commerce riešenia</h2>
+                <p>Tvorba profesionálnych online obchodov s plnou funkčnosťou, ktoré umožňujú ľahko predávať vaše produkty alebo služby a spravovať objednávky, platby a zákazníkov.</p>
+                <ul class="service-features">
+                    <li>Produktové katalógy</li>
+                    <li>Nákupný košík a pokladňa</li>
+                    <li>Integracia platobných brán</li>
+                    <li>Správa objednávok</li>
+                    <li>Správa objednávok</li>
+                    <li>Responzívny dizajn pre m-commerce</li>
+                </ul>
+                <a href="#" class="service-btn">Zistiť viac</a>
+            </div>
+            
+            <!-- Service 4: Optimalizácia a údržba -->
+            <div class="service-card">
+                <div class="service-icon">⚡</div>
+                <h2>Optimalizácia a údržba</h2>
+                <p>Neustále zlepšovanie výkonu, bezpečnosti a funkčnosti vašich existujúcich webových stránok, aby boli vždy aktuálne, rýchle a bezpečné pre vašich návštevníkov.</p>
+                <ul class="service-features">
+                    <li>Analýza a optimalizácia výkonu</li>
+                    <li>Bezpečnostné aktualizácie</li>
+                    <li>Opravy chyb a vylepšenia</li>
+                    <li>SEO optimalizácia</li>
+                    <li>Pravidelná údržba a monitoring</li>
+                </ul>
+                <a href="#" class="service-btn">Zistiť viac</a>
+            </div>
+        </div>
+        
+        <div class="cta-section">
+            <h2>Pripravení na začatie?</h2>
+            <p>Kontaktujte ma ešte dnes a začneme na vašom projekte, ktorý bude nejen vyzerať skvele, ale aj prinášať výsledky.</p>
+            <a href="about-me.html" class="primary-btn">Získajte bezplatnú konzultáciu</a>
+        </div>
+        
+        <div class="footer">
+            &copy; 2026 Freelancer Web Development. Všetky práva vyhradené.
+        </div>
+    </div>
+</body>
+</html>
