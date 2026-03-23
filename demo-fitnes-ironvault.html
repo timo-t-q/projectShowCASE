@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IRONVAULT — Prémiové fitnes</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  :root { --black: #0A0A0A; --red: #E81B1B; --red-dark: #B01414; --white: #F8F8F8; --gray: #181818; --mid: #2A2A2A; --muted: rgba(248,248,248,0.45); }
+  html { scroll-behavior: smooth; }
+  body { background: var(--black); color: var(--white); font-family: 'DM Sans', sans-serif; font-weight: 400; overflow-x: hidden; }
+  nav { position: fixed; top: 0; left: 0; right: 0; display: flex; justify-content: space-between; align-items: center; padding: 20px 60px; z-index: 100; background: rgba(10,10,10,0.9); backdrop-filter: blur(8px); border-bottom: 1px solid rgba(255,255,255,0.06); }
+  .logo { font-family: 'Bebas Neue', sans-serif; font-size: 1.8rem; letter-spacing: 0.1em; line-height: 1; }
+  .logo span { color: var(--red); }
+  nav ul { list-style: none; display: flex; gap: 36px; }
+  nav ul a { text-decoration: none; color: var(--muted); font-size: 0.82rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; transition: color 0.2s; }
+  nav ul a:hover { color: var(--white); }
+  .nav-join { background: var(--red); color: var(--white); border: none; padding: 11px 28px; font-family: 'DM Sans', sans-serif; font-size: 0.82rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; transition: background 0.25s, transform 0.2s; }
+  .nav-join:hover { background: var(--red-dark); transform: translateY(-1px); }
+  .hero { min-height: 100vh; position: relative; display: flex; align-items: flex-end; padding: 0 60px 100px; overflow: hidden; }
+  .hero-bg { position: absolute; inset: 0; background: linear-gradient(160deg, var(--gray) 0%, var(--black) 60%); }
+  .hero-stripe { position: absolute; top: 0; right: -10%; width: 55%; height: 100%; background: var(--red); clip-path: polygon(15% 0, 100% 0, 100% 100%, 0% 100%); opacity: 0.08; }
+  .hero-number { position: absolute; right: 80px; bottom: 0; font-family: 'Bebas Neue', sans-serif; font-size: 28vw; line-height: 0.8; color: rgba(255,255,255,0.025); user-select: none; pointer-events: none; }
+  .hero-content { position: relative; z-index: 1; max-width: 780px; }
+  .hero-pre { font-size: 0.75rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--red); font-weight: 500; margin-bottom: 20px; display: flex; align-items: center; gap: 14px; }
+  .hero-pre::before { content: ''; width: 36px; height: 2px; background: var(--red); }
+  h1 { font-family: 'Bebas Neue', sans-serif; font-size: clamp(4.5rem, 10vw, 11rem); line-height: 0.9; letter-spacing: 0.02em; margin-bottom: 32px; }
+  h1 .white { color: var(--white); display: block; }
+  h1 .red { color: var(--red); display: block; }
+  h1 .outline { -webkit-text-stroke: 2px rgba(255,255,255,0.2); color: transparent; display: block; }
+  .hero-desc { font-size: 1rem; line-height: 1.7; color: var(--muted); max-width: 440px; margin-bottom: 48px; }
+  .hero-btns { display: flex; gap: 16px; }
+  .btn-red { background: var(--red); color: var(--white); border: none; padding: 18px 44px; font-family: 'DM Sans', sans-serif; font-size: 0.85rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; transition: background 0.25s, transform 0.2s; }
+  .btn-red:hover { background: var(--red-dark); transform: translateY(-2px); }
+  .btn-bare { background: none; border: 1px solid rgba(255,255,255,0.15); color: var(--white); padding: 18px 44px; font-family: 'DM Sans', sans-serif; font-size: 0.85rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; transition: border-color 0.25s; }
+  .btn-bare:hover { border-color: rgba(255,255,255,0.4); }
+  .hero-stats { position: absolute; right: 180px; bottom: 100px; display: flex; flex-direction: column; gap: 32px; z-index: 1; }
+  .hstat .num { font-family: 'Bebas Neue', sans-serif; font-size: 2.8rem; line-height: 1; color: var(--white); }
+  .hstat .num span { color: var(--red); }
+  .hstat .lbl { font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); }
+  .ticker { background: var(--red); padding: 14px 0; overflow: hidden; }
+  .ticker-inner { display: inline-flex; animation: ticker 14s linear infinite; gap: 60px; white-space: nowrap; font-family: 'Bebas Neue', sans-serif; font-size: 1rem; letter-spacing: 0.15em; }
+  @keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+  .programs { padding: 120px 60px; }
+  .section-head { margin-bottom: 64px; }
+  .pre-tag { font-size: 0.72rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--red); font-weight: 500; margin-bottom: 14px; display: flex; align-items: center; gap: 14px; }
+  .pre-tag::before { content: ''; width: 28px; height: 2px; background: var(--red); }
+  .section-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(3rem, 5vw, 5rem); line-height: 1; letter-spacing: 0.03em; }
+  .programs-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 3px; }
+  .prog-card { background: var(--gray); padding: 44px 32px; position: relative; overflow: hidden; cursor: pointer; transition: background 0.3s; border-top: 3px solid transparent; min-height: 300px; display: flex; flex-direction: column; justify-content: flex-end; }
+  .prog-card:hover { background: var(--mid); border-top-color: var(--red); }
+  .prog-card:hover .prog-arrow { opacity: 1; transform: translateX(0); }
+  .prog-num { position: absolute; top: 28px; right: 28px; font-family: 'Bebas Neue', sans-serif; font-size: 3.5rem; line-height: 1; color: rgba(255,255,255,0.06); }
+  .prog-icon { font-size: 2rem; margin-bottom: 20px; opacity: 0.8; }
+  .prog-name { font-family: 'Bebas Neue', sans-serif; font-size: 1.6rem; letter-spacing: 0.05em; margin-bottom: 10px; }
+  .prog-desc { font-size: 0.82rem; color: var(--muted); line-height: 1.6; margin-bottom: 24px; }
+  .prog-tag { display: inline-block; background: rgba(232,27,27,0.15); color: var(--red); font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; padding: 5px 12px; font-weight: 500; }
+  .prog-arrow { position: absolute; top: 28px; left: 32px; font-size: 1.2rem; opacity: 0; transform: translateX(-8px); transition: all 0.3s; }
+  .trainers { padding: 120px 60px; background: var(--gray); }
+  .trainers-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 64px; }
+  .trainer-card { border: 1px solid rgba(255,255,255,0.06); overflow: hidden; position: relative; }
+  .trainer-img { height: 260px; background: var(--mid); display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+  .trainer-img::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to bottom, transparent 40%, var(--gray)); }
+  .trainer-silhouette { font-size: 6rem; opacity: 0.15; }
+  .trainer-body { padding: 28px 28px 32px; }
+  .trainer-name { font-family: 'Bebas Neue', sans-serif; font-size: 1.6rem; letter-spacing: 0.05em; margin-bottom: 4px; }
+  .trainer-spec { font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--red); margin-bottom: 16px; font-weight: 500; }
+  .trainer-bio { font-size: 0.85rem; color: var(--muted); line-height: 1.65; }
+  .membership { padding: 120px 60px; position: relative; overflow: hidden; background: var(--black); display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }
+  .membership::before { content: ''; position: absolute; width: 600px; height: 600px; background: radial-gradient(circle, rgba(232,27,27,0.1) 0%, transparent 70%); right: 0; bottom: -100px; pointer-events: none; }
+  .membership h2 { font-family: 'Bebas Neue', sans-serif; font-size: clamp(3rem, 5vw, 5.5rem); line-height: 1; letter-spacing: 0.03em; margin-bottom: 24px; }
+  .membership h2 span { color: var(--red); }
+  .membership p { font-size: 0.95rem; color: var(--muted); line-height: 1.7; margin-bottom: 40px; }
+  .plans-stack { display: flex; flex-direction: column; gap: 12px; }
+  .plan-row { border: 1px solid rgba(255,255,255,0.08); padding: 24px 28px; display: flex; justify-content: space-between; align-items: center; transition: border-color 0.3s, background 0.3s; cursor: pointer; }
+  .plan-row:hover { border-color: var(--red); background: rgba(232,27,27,0.05); }
+  .plan-row.highlight { border-color: var(--red); background: rgba(232,27,27,0.08); }
+  .plan-name-r { font-family: 'Bebas Neue', sans-serif; font-size: 1.3rem; letter-spacing: 0.05em; margin-bottom: 4px; }
+  .plan-details { font-size: 0.78rem; color: var(--muted); }
+  .plan-price-r { text-align: right; }
+  .plan-price-r .amount { font-family: 'Bebas Neue', sans-serif; font-size: 2rem; line-height: 1; color: var(--white); }
+  .plan-price-r .per { font-size: 0.72rem; color: var(--muted); }
+  footer { background: #050505; border-top: 1px solid rgba(255,255,255,0.06); padding: 40px 60px; display: flex; justify-content: space-between; align-items: center; }
+  footer p { font-size: 0.78rem; color: var(--muted); letter-spacing: 0.05em; }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(50px); } to { opacity: 1; transform: translateY(0); } }
+  .hero-pre { animation: fadeUp 0.6s 0.1s ease forwards; opacity: 0; }
+  .hero h1 { animation: fadeUp 0.7s 0.25s ease forwards; opacity: 0; }
+  .hero-desc { animation: fadeUp 0.7s 0.4s ease forwards; opacity: 0; }
+  .hero-btns { animation: fadeUp 0.7s 0.5s ease forwards; opacity: 0; }
+</style>
+</head>
+<body>
+<nav>
+  <div class="logo">IRON<span>VAULT</span></div>
+  <ul>
+    <li><a href="#">Programy</a></li>
+    <li><a href="#">Tréneri</a></li>
+    <li><a href="#">Členstvo</a></li>
+    <li><a href="#">Rozvrh</a></li>
+  </ul>
+  <button class="nav-join">Stať sa členom</button>
+</nav>
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-stripe"></div>
+  <div class="hero-number">IV</div>
+  <div class="hero-content">
+    <div class="hero-pre">Prémiové tréningové zariadenie</div>
+    <h1><span class="white">KUJTE</span><span class="red">SVOJE</span><span class="outline">LIMITY.</span></h1>
+    <p class="hero-desc">Elitné tréningové programy. Odborní tréneri. Špičkové vybavenie. Žiadne výhovorky. Len výsledky.</p>
+    <div class="hero-btns">
+      <button class="btn-red">Začať trénovať →</button>
+      <button class="btn-bare">Pozrieť programy</button>
+    </div>
+  </div>
+  <div class="hero-stats">
+    <div class="hstat"><div class="num">2<span>k+</span></div><div class="lbl">Členov</div></div>
+    <div class="hstat"><div class="num">18<span>+</span></div><div class="lbl">Programov</div></div>
+    <div class="hstat"><div class="num">8<span>r</span></div><div class="lbl">Skúseností</div></div>
+  </div>
+</section>
+<div class="ticker">
+  <div class="ticker-inner">
+    <span>SILA</span><span>★</span><span>KONDÍCIA</span><span>★</span><span>VYTRVALOSŤ</span><span>★</span>
+    <span>HIIT</span><span>★</span><span>SILOVÝ TROJBOJ</span><span>★</span><span>BOX</span><span>★</span>
+    <span>VÝŽIVA</span><span>★</span><span>REGENERÁCIA</span><span>★</span>
+    <span>SILA</span><span>★</span><span>KONDÍCIA</span><span>★</span><span>VYTRVALOSŤ</span><span>★</span>
+    <span>HIIT</span><span>★</span><span>SILOVÝ TROJBOJ</span><span>★</span><span>BOX</span><span>★</span>
+    <span>VÝŽIVA</span><span>★</span><span>REGENERÁCIA</span><span>★</span>
+  </div>
+</div>
+<section class="programs">
+  <div class="section-head"><div class="pre-tag">Čo ponúkame</div><div class="section-title">TRÉNINGOVÉ<br>PROGRAMY</div></div>
+  <div class="programs-grid">
+    <div class="prog-card"><div class="prog-num">01</div><div class="prog-arrow">→</div><div class="prog-icon">🏋️</div><div class="prog-name">Sila a výkon</div><p class="prog-desc">Progresívne preťažovanie navrhnuté na maximalizáciu sily a hustoty svalov.</p><div class="prog-tag">3× / týždeň</div></div>
+    <div class="prog-card"><div class="prog-num">02</div><div class="prog-arrow">→</div><div class="prog-icon">⚡</div><div class="prog-name">HIIT Burn</div><p class="prog-desc">Vysoko intenzívne intervaly na spaľovanie kalórií a rýchle budovanie výdrže.</p><div class="prog-tag">5× / týždeň</div></div>
+    <div class="prog-card"><div class="prog-num">03</div><div class="prog-arrow">→</div><div class="prog-icon">🥊</div><div class="prog-name">Bojová kondícia</div><p class="prog-desc">Box a kondičná príprava. Rozvíjajte agilitu, jadro a mentálnu odolnosť.</p><div class="prog-tag">4× / týždeň</div></div>
+    <div class="prog-card"><div class="prog-num">04</div><div class="prog-arrow">→</div><div class="prog-icon">🏃</div><div class="prog-name">Športový výkon</div><p class="prog-desc">Kondičná príprava pre športovcov. Rýchlosť, explozivita a prevencia zranení.</p><div class="prog-tag">4× / týždeň</div></div>
+  </div>
+</section>
+<section class="trainers">
+  <div class="section-head"><div class="pre-tag">Tím</div><div class="section-title">NAŠI TRÉNERI</div></div>
+  <div class="trainers-grid">
+    <div class="trainer-card"><div class="trainer-img"><div class="trainer-silhouette">🧑</div></div><div class="trainer-body"><div class="trainer-name">MAREK KOVAČ</div><div class="trainer-spec">Sila a silový trojboj</div><p class="trainer-bio">8-ročný súťažný trojbojár. Certifikovaný NSCA silový tréner. Špecializuje sa na prípravu pre začiatočníkov aj pokročilých.</p></div></div>
+    <div class="trainer-card"><div class="trainer-img"><div class="trainer-silhouette">🧑</div></div><div class="trainer-body"><div class="trainer-name">LUCIA NOVÁK</div><div class="trainer-spec">HIIT a funkčná kondícia</div><p class="trainer-bio">CrossFit Level 2 trénerka so zázemím v súťažnej atletike. Vytvára rýchle a efektívne tréningy celého tela s merateľnými výsledkami.</p></div></div>
+    <div class="trainer-card"><div class="trainer-img"><div class="trainer-silhouette">🧑</div></div><div class="trainer-body"><div class="trainer-name">TOMÁŠ BLAHO</div><div class="trainer-spec">Bojové športy a kondícia</div><p class="trainer-bio">Bývalý poloamatérsky MMA zápasník. Kombinuje skutočnú bojovú techniku s elitnou kondičnou prípravou.</p></div></div>
+  </div>
+</section>
+<section class="membership">
+  <div>
+    <div class="pre-tag">Členstvo</div>
+    <h2>ŽIADNE ZMLUVY.<br>LEN <span>VÝSLEDKY.</span></h2>
+    <p>Flexibilné plány, ktoré sa prispôsobia vášmu rozvrhu a cieľom. Zrušte kedykoľvek. Žiadne skryté poplatky. Len čistý, sústredený tréning.</p>
+    <button class="btn-red">Začať dnes →</button>
+  </div>
+  <div class="plans-stack">
+    <div class="plan-row"><div><div class="plan-name-r">Základné</div><div class="plan-details">Prístup do posilňovne · 6:00–22:00</div></div><div class="plan-price-r"><div class="amount">29 €</div><div class="per">/mesiac</div></div></div>
+    <div class="plan-row highlight"><div><div class="plan-name-r">Pro člen</div><div class="plan-details">Plný prístup + 4 PT tréningy/mes</div></div><div class="plan-price-r"><div class="amount">69 €</div><div class="per">/mesiac</div></div></div>
+    <div class="plan-row"><div><div class="plan-name-r">Elite</div><div class="plan-details">Neobmedzené PT + výživový plán</div></div><div class="plan-price-r"><div class="amount">129 €</div><div class="per">/mesiac</div></div></div>
+    <div class="plan-row"><div><div class="plan-name-r">Denný lístok</div><div class="plan-details">Jednorazový plný prístup</div></div><div class="plan-price-r"><div class="amount">12 €</div><div class="per">/deň</div></div></div>
+  </div>
+</section>
+<footer>
+  <div class="logo" style="font-size:1.4rem;">IRON<span style="color:var(--red)">VAULT</span></div>
+  <p>© 2025 IronVault Performance — Bratislava</p>
+</footer>
+</body>
+</html>

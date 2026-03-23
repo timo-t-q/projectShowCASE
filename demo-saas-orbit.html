@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Orbit — Analytická platforma</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  :root { --bg: #070B14; --surface: #0D1220; --border: rgba(255,255,255,0.06); --cyan: #00E5FF; --violet: #8B5CF6; --white: #F0F4FF; --muted: rgba(240,244,255,0.45); --card-bg: rgba(13,18,32,0.7); }
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); color: var(--white); font-family: 'Syne', sans-serif; overflow-x: hidden; }
+  body::before { content: ''; position: fixed; inset: 0; background-image: linear-gradient(rgba(0,229,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,229,255,0.03) 1px, transparent 1px); background-size: 60px 60px; pointer-events: none; z-index: 0; }
+  nav { position: fixed; top: 0; left: 0; right: 0; display: flex; justify-content: space-between; align-items: center; padding: 22px 60px; z-index: 100; background: rgba(7,11,20,0.7); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); }
+  .logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.4rem; letter-spacing: 0.02em; display: flex; align-items: center; gap: 10px; }
+  .logo-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--cyan); box-shadow: 0 0 16px var(--cyan); animation: pulse 2s ease-in-out infinite; }
+  @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.6; transform: scale(0.85); } }
+  nav ul { list-style: none; display: flex; gap: 36px; }
+  nav ul a { text-decoration: none; color: var(--muted); font-size: 0.82rem; font-weight: 600; letter-spacing: 0.05em; transition: color 0.25s; }
+  nav ul a:hover { color: var(--white); }
+  .nav-cta { background: var(--cyan); color: var(--bg); border: none; padding: 10px 24px; font-family: 'Syne', sans-serif; font-size: 0.82rem; font-weight: 700; letter-spacing: 0.05em; cursor: pointer; border-radius: 4px; transition: box-shadow 0.3s, transform 0.2s; }
+  .nav-cta:hover { box-shadow: 0 0 24px rgba(0,229,255,0.5); transform: translateY(-1px); }
+  .hero { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 140px 60px 80px; position: relative; z-index: 1; }
+  .hero::after { content: ''; position: absolute; width: 700px; height: 700px; background: radial-gradient(circle, rgba(139,92,246,0.15) 0%, transparent 70%); top: 50%; left: 50%; transform: translate(-50%, -60%); pointer-events: none; z-index: -1; }
+  .hero-badge { display: inline-flex; align-items: center; gap: 8px; border: 1px solid rgba(0,229,255,0.3); background: rgba(0,229,255,0.05); color: var(--cyan); padding: 6px 16px; border-radius: 100px; font-family: 'Space Mono', monospace; font-size: 0.7rem; letter-spacing: 0.08em; margin-bottom: 40px; animation: fadeDown 0.6s ease forwards; }
+  .badge-dot { width: 6px; height: 6px; background: var(--cyan); border-radius: 50%; animation: pulse 1.5s ease-in-out infinite; }
+  .hero h1 { font-weight: 800; font-size: clamp(3rem, 6.5vw, 7rem); line-height: 1.0; letter-spacing: -0.02em; margin-bottom: 28px; animation: fadeDown 0.7s 0.15s ease forwards; opacity: 0; }
+  .hero h1 .cyan { color: var(--cyan); }
+  .hero h1 .outline { -webkit-text-stroke: 1.5px rgba(240,244,255,0.3); color: transparent; }
+  .hero-sub { font-size: 1.05rem; color: var(--muted); max-width: 540px; line-height: 1.7; margin-bottom: 48px; font-weight: 400; animation: fadeDown 0.7s 0.3s ease forwards; opacity: 0; }
+  .hero-btns { display: flex; gap: 16px; justify-content: center; animation: fadeDown 0.7s 0.45s ease forwards; opacity: 0; }
+  .btn-glow { background: var(--cyan); color: var(--bg); border: none; padding: 15px 36px; font-family: 'Syne', sans-serif; font-size: 0.85rem; font-weight: 700; border-radius: 4px; cursor: pointer; transition: box-shadow 0.3s, transform 0.2s; }
+  .btn-glow:hover { box-shadow: 0 0 40px rgba(0,229,255,0.5); transform: translateY(-2px); }
+  .btn-outline { background: transparent; color: var(--white); border: 1px solid var(--border); padding: 15px 36px; font-family: 'Syne', sans-serif; font-size: 0.85rem; font-weight: 600; border-radius: 4px; cursor: pointer; transition: border-color 0.3s, background 0.3s; }
+  .btn-outline:hover { border-color: rgba(255,255,255,0.25); background: rgba(255,255,255,0.05); }
+  .mockup-wrap { margin-top: 80px; position: relative; max-width: 900px; width: 100%; animation: fadeDown 0.9s 0.6s ease forwards; opacity: 0; }
+  .mockup-glow { position: absolute; inset: -2px; background: linear-gradient(135deg, var(--cyan), var(--violet)); border-radius: 12px; opacity: 0.3; filter: blur(1px); }
+  .mockup { position: relative; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+  .mockup-bar { background: rgba(255,255,255,0.04); padding: 12px 20px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid var(--border); }
+  .dot { width: 10px; height: 10px; border-radius: 50%; }
+  .dot.r { background: #FF5F56; } .dot.y { background: #FFBD2E; } .dot.g { background: #27C93F; }
+  .url-bar { flex: 1; background: rgba(0,0,0,0.3); border-radius: 4px; padding: 5px 12px; font-family: 'Space Mono', monospace; font-size: 0.65rem; color: var(--muted); margin-left: 12px; }
+  .mockup-content { padding: 24px; display: grid; grid-template-columns: 180px 1fr; gap: 16px; height: 340px; }
+  .mockup-sidebar { border-right: 1px solid var(--border); padding-right: 16px; display: flex; flex-direction: column; gap: 6px; }
+  .side-item { padding: 8px 12px; border-radius: 6px; font-size: 0.72rem; font-weight: 600; color: var(--muted); display: flex; align-items: center; gap: 8px; }
+  .side-item.active { background: rgba(0,229,255,0.1); color: var(--cyan); }
+  .side-icon { width: 14px; height: 14px; background: currentColor; border-radius: 2px; opacity: 0.6; }
+  .mockup-main { padding-left: 8px; }
+  .stat-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; }
+  .stat-card { background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 8px; padding: 16px; }
+  .stat-label { font-size: 0.65rem; color: var(--muted); font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 8px; }
+  .stat-val { font-size: 1.4rem; font-weight: 800; color: var(--white); line-height: 1; }
+  .stat-change { font-family: 'Space Mono', monospace; font-size: 0.6rem; color: #00E896; margin-top: 4px; }
+  .chart-area { background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 8px; padding: 16px; height: 160px; display: flex; align-items: flex-end; gap: 6px; }
+  .bar { flex: 1; border-radius: 3px 3px 0 0; transition: filter 0.3s; }
+  .bar:hover { filter: brightness(1.4); }
+  .features { padding: 120px 60px; position: relative; z-index: 1; }
+  .features-header { text-align: center; margin-bottom: 80px; }
+  .tag { font-family: 'Space Mono', monospace; font-size: 0.7rem; color: var(--cyan); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 16px; display: block; }
+  .features h2 { font-size: clamp(2rem, 3.5vw, 3.5rem); font-weight: 800; line-height: 1.1; letter-spacing: -0.02em; }
+  .features h2 .dim { color: var(--muted); font-weight: 400; }
+  .features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; }
+  .feat-card { background: var(--card-bg); border: 1px solid var(--border); padding: 44px 36px; position: relative; overflow: hidden; transition: border-color 0.3s, background 0.3s; }
+  .feat-card:hover { border-color: rgba(0,229,255,0.3); background: rgba(0,229,255,0.04); }
+  .feat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, var(--cyan), transparent); opacity: 0; transition: opacity 0.3s; }
+  .feat-card:hover::before { opacity: 1; }
+  .feat-icon { width: 44px; height: 44px; border-radius: 8px; background: rgba(0,229,255,0.1); border: 1px solid rgba(0,229,255,0.2); display: flex; align-items: center; justify-content: center; margin-bottom: 24px; font-size: 1.2rem; }
+  .feat-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 12px; }
+  .feat-desc { font-size: 0.88rem; color: var(--muted); line-height: 1.7; font-weight: 400; }
+  .pricing { padding: 120px 60px; position: relative; z-index: 1; }
+  .pricing-header { text-align: center; margin-bottom: 64px; }
+  .pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; max-width: 940px; margin: 0 auto; }
+  .plan { border: 1px solid var(--border); border-radius: 12px; padding: 36px 32px; background: var(--card-bg); position: relative; transition: transform 0.3s, border-color 0.3s; }
+  .plan:hover { transform: translateY(-4px); }
+  .plan.featured { border-color: var(--cyan); background: rgba(0,229,255,0.05); }
+  .plan-badge { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: var(--cyan); color: var(--bg); font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; padding: 4px 14px; border-radius: 100px; }
+  .plan-name { font-size: 0.8rem; font-weight: 700; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 20px; }
+  .plan-price { font-size: 2.8rem; font-weight: 800; line-height: 1; margin-bottom: 6px; }
+  .plan-price span { font-size: 1rem; font-weight: 400; color: var(--muted); }
+  .plan-period { font-size: 0.8rem; color: var(--muted); margin-bottom: 28px; }
+  .plan-features { list-style: none; display: flex; flex-direction: column; gap: 12px; margin-bottom: 32px; }
+  .plan-features li { font-size: 0.85rem; color: var(--muted); display: flex; align-items: center; gap: 10px; font-weight: 400; }
+  .plan-features li::before { content: '✓'; color: var(--cyan); font-weight: 700; font-size: 0.8rem; }
+  .cta-section { padding: 120px 60px; text-align: center; position: relative; z-index: 1; }
+  .cta-section::before { content: ''; position: absolute; width: 500px; height: 500px; background: radial-gradient(circle, rgba(0,229,255,0.08) 0%, transparent 70%); top: 50%; left: 50%; transform: translate(-50%, -50%); pointer-events: none; }
+  .cta-section h2 { font-size: clamp(2.5rem, 5vw, 5rem); font-weight: 800; letter-spacing: -0.02em; margin-bottom: 20px; }
+  footer { border-top: 1px solid var(--border); padding: 40px 60px; display: flex; justify-content: space-between; align-items: center; position: relative; z-index: 1; }
+  footer p { font-size: 0.78rem; color: var(--muted); font-family: 'Space Mono', monospace; }
+  @keyframes fadeDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+</head>
+<body>
+<nav>
+  <div class="logo"><div class="logo-dot"></div>Orbit</div>
+  <ul>
+    <li><a href="#">Produkt</a></li>
+    <li><a href="#">Funkcie</a></li>
+    <li><a href="#">Cenník</a></li>
+    <li><a href="#">Dokumentácia</a></li>
+  </ul>
+  <button class="nav-cta">Skúsiť zadarmo</button>
+</nav>
+<section class="hero">
+  <div class="hero-badge"><div class="badge-dot"></div>Teraz vo verejnej beta — vydanie v2.1</div>
+  <h1>Analytika, ktorá<br>skutočne <span class="cyan">posúva</span><br><span class="outline">hranice.</span></h1>
+  <p class="hero-sub">Orbit dáva vášmu tímu pohľad v reálnom čase na to, čo je dôležité. Posielajte rýchlejšie, predpovedajte múdrejšie a premeňte surové dáta na rozhodnutia — všetko na jednom mieste.</p>
+  <div class="hero-btns">
+    <button class="btn-glow">Začať zadarmo</button>
+    <button class="btn-outline">Pozrieť demo →</button>
+  </div>
+  <div class="mockup-wrap">
+    <div class="mockup-glow"></div>
+    <div class="mockup">
+      <div class="mockup-bar">
+        <div class="dot r"></div><div class="dot y"></div><div class="dot g"></div>
+        <div class="url-bar">app.orbit.io/dashboard</div>
+      </div>
+      <div class="mockup-content">
+        <div class="mockup-sidebar">
+          <div class="side-item active"><div class="side-icon"></div>Dashboard</div>
+          <div class="side-item"><div class="side-icon"></div>Analytika</div>
+          <div class="side-item"><div class="side-icon"></div>Lievik</div>
+          <div class="side-item"><div class="side-icon"></div>Správy</div>
+          <div class="side-item"><div class="side-icon"></div>Používatelia</div>
+          <div class="side-item"><div class="side-icon"></div>Upozornenia</div>
+          <div class="side-item"><div class="side-icon"></div>Nastavenia</div>
+        </div>
+        <div class="mockup-main">
+          <div class="stat-row">
+            <div class="stat-card"><div class="stat-label">Aktívni používatelia</div><div class="stat-val">24 391</div><div class="stat-change">+12,4 %</div></div>
+            <div class="stat-card"><div class="stat-label">Konverzia</div><div class="stat-val">8,3 %</div><div class="stat-change">+0,6 %</div></div>
+            <div class="stat-card"><div class="stat-label">Tržby</div><div class="stat-val">91 200 €</div><div class="stat-change">+23,1 %</div></div>
+          </div>
+          <div class="chart-area">
+            <div class="bar" style="height:40%; background: linear-gradient(to top, #00E5FF, rgba(0,229,255,0.3));"></div>
+            <div class="bar" style="height:65%; background: linear-gradient(to top, #00E5FF, rgba(0,229,255,0.3));"></div>
+            <div class="bar" style="height:48%; background: linear-gradient(to top, #00E5FF, rgba(0,229,255,0.3));"></div>
+            <div class="bar" style="height:80%; background: linear-gradient(to top, #8B5CF6, rgba(139,92,246,0.3));"></div>
+            <div class="bar" style="height:55%; background: linear-gradient(to top, #00E5FF, rgba(0,229,255,0.3));"></div>
+            <div class="bar" style="height:90%; background: linear-gradient(to top, #00E5FF, rgba(0,229,255,0.3));"></div>
+            <div class="bar" style="height:70%; background: linear-gradient(to top, #8B5CF6, rgba(139,92,246,0.3));"></div>
+            <div class="bar" style="height:85%; background: linear-gradient(to top, #00E5FF, rgba(0,229,255,0.3));"></div>
+            <div class="bar" style="height:60%; background: linear-gradient(to top, #00E5FF, rgba(0,229,255,0.3));"></div>
+            <div class="bar" style="height:95%; background: linear-gradient(to top, #00E896, rgba(0,232,150,0.3));"></div>
+            <div class="bar" style="height:78%; background: linear-gradient(to top, #00E5FF, rgba(0,229,255,0.3));"></div>
+            <div class="bar" style="height:88%; background: linear-gradient(to top, #00E5FF, rgba(0,229,255,0.3));"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="features">
+  <div class="features-header">
+    <span class="tag">Čo získate</span>
+    <h2>Všetko čo potrebujete.<br><span class="dim">Nič navyše.</span></h2>
+  </div>
+  <div class="features-grid">
+    <div class="feat-card"><div class="feat-icon">⚡</div><div class="feat-title">Dáta v reálnom čase</div><p class="feat-desc">Zachytávanie udalostí v zlomku sekundy. Sledujte správanie používateľov na živých dashboardoch.</p></div>
+    <div class="feat-card"><div class="feat-icon">🔮</div><div class="feat-title">Prediktívna AI</div><p class="feat-desc">ML predpovede natrénované na vašich dátach. Predpovedajte odchod zákazníkov a výkon kampaní.</p></div>
+    <div class="feat-card"><div class="feat-icon">🧩</div><div class="feat-title">Hĺbkové integrácie</div><p class="feat-desc">Prepojenie s 120+ nástrojmi. Stripe, Segment, Hubspot, Salesforce — celý váš zásobník na jednom mieste.</p></div>
+    <div class="feat-card"><div class="feat-icon">🛡️</div><div class="feat-title">Ochrana súkromia</div><p class="feat-desc">GDPR a SOC2 predvolene. Len vlastné dáta. Žiadne cookies, žiadne odtlačky prstov.</p></div>
+    <div class="feat-card"><div class="feat-icon">📐</div><div class="feat-title">Vlastné správy</div><p class="feat-desc">Správy pomocou drag-and-drop. Zdieľajte živé odkazy so zainteresovanými stranami alebo exportujte do PDF.</p></div>
+    <div class="feat-card"><div class="feat-icon">🔔</div><div class="feat-title">Inteligentné upozornenia</div><p class="feat-desc">Nastavte prahové alebo anomálne upozornenia. Dostávajte správy cez Slack, e-mail alebo webhook.</p></div>
+  </div>
+</section>
+<section class="pricing">
+  <div class="pricing-header">
+    <span class="tag">Cenník</span>
+    <h2>Jednoduché. Transparentné.<br><span style="color:var(--muted);font-weight:400">Žiadne prekvapenia.</span></h2>
+  </div>
+  <div class="pricing-grid">
+    <div class="plan">
+      <div class="plan-name">Štarter</div>
+      <div class="plan-price">0 €<span>/mes</span></div>
+      <div class="plan-period">Navždy zadarmo</div>
+      <ul class="plan-features"><li>Až 10 000 udalostí/mes</li><li>3 dashboardy</li><li>7-dňová história dát</li><li>E-mailová podpora</li></ul>
+      <button class="btn-outline" style="width:100%">Začať</button>
+    </div>
+    <div class="plan featured">
+      <div class="plan-badge">Najobľúbenejší</div>
+      <div class="plan-name">Pro</div>
+      <div class="plan-price">49 €<span>/mes</span></div>
+      <div class="plan-period">za pracovný priestor</div>
+      <ul class="plan-features"><li>Neobmedzené udalosti</li><li>Neobmedzené dashboardy</li><li>1-ročná história dát</li><li>Prediktívne AI funkcie</li><li>Prioritná podpora</li></ul>
+      <button class="btn-glow" style="width:100%">Skúsiť zadarmo</button>
+    </div>
+    <div class="plan">
+      <div class="plan-name">Enterprise</div>
+      <div class="plan-price">Individuálne</div>
+      <div class="plan-period">objemové ceny</div>
+      <ul class="plan-features"><li>Všetko v Pro</li><li>SSO a SAML</li><li>Vlastná doba uchovávania</li><li>Dedikovaný CSM</li><li>Záruka SLA</li></ul>
+      <button class="btn-outline" style="width:100%">Kontaktovať obchod</button>
+    </div>
+  </div>
+</section>
+<section class="cta-section">
+  <h2>Pripravení vidieť<br><span style="color:var(--cyan)">vaše dáta jasne?</span></h2>
+  <p style="color:var(--muted);margin-bottom:40px;font-size:1rem;">Pridajte sa k 4 000+ tímom, ktoré už používajú Orbit.</p>
+  <button class="btn-glow" style="font-size:0.95rem;padding:18px 48px;">Začať zadarmo — Bez platobnej karty</button>
+</section>
+<footer>
+  <div class="logo"><div class="logo-dot" style="width:8px;height:8px;"></div> Orbit</div>
+  <p>© 2025 Orbit Analytics Inc.</p>
+</footer>
+</body>
+</html>

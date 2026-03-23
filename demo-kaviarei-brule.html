@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Brûlé — Špeciálna káva</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --cream: #F5EFE0; --espresso: #2C1A0E;
+    --caramel: #C07D3E; --latte: #D4A97A; --fog: #EAE0CF;
+  }
+  html { scroll-behavior: smooth; }
+  body { background: var(--cream); color: var(--espresso); font-family: 'Jost', sans-serif; font-weight: 300; overflow-x: hidden; }
+  body::before {
+    content: ''; position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none; z-index: 999; opacity: 0.5;
+  }
+  nav {
+    position: fixed; top: 0; left: 0; right: 0;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 24px 60px; z-index: 100; mix-blend-mode: multiply;
+  }
+  .logo { font-family: 'Playfair Display', serif; font-size: 1.5rem; letter-spacing: 0.04em; color: var(--espresso); }
+  .logo span { font-style: italic; color: var(--caramel); }
+  nav ul { list-style: none; display: flex; gap: 40px; }
+  nav ul a { text-decoration: none; color: var(--espresso); font-size: 0.8rem; letter-spacing: 0.15em; text-transform: uppercase; font-weight: 500; opacity: 0.7; transition: opacity 0.3s; }
+  nav ul a:hover { opacity: 1; }
+  .hero { min-height: 100vh; display: grid; grid-template-columns: 1fr 1fr; overflow: hidden; }
+  .hero-left { display: flex; flex-direction: column; justify-content: center; padding: 140px 60px 80px; position: relative; z-index: 1; }
+  .hero-tag { font-size: 0.72rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--caramel); font-weight: 500; margin-bottom: 32px; display: flex; align-items: center; gap: 12px; }
+  .hero-tag::before { content: ''; width: 32px; height: 1px; background: var(--caramel); }
+  h1 { font-family: 'Playfair Display', serif; font-size: clamp(3.5rem, 6vw, 6rem); line-height: 1.0; font-weight: 700; margin-bottom: 32px; }
+  h1 em { font-style: italic; color: var(--caramel); display: block; }
+  .hero-desc { font-size: 1rem; line-height: 1.8; max-width: 400px; opacity: 0.7; margin-bottom: 48px; }
+  .btn-group { display: flex; gap: 16px; align-items: center; }
+  .btn-primary { background: var(--espresso); color: var(--cream); padding: 16px 36px; border: none; font-family: 'Jost', sans-serif; font-size: 0.8rem; letter-spacing: 0.15em; text-transform: uppercase; font-weight: 500; cursor: pointer; transition: background 0.3s, transform 0.2s; }
+  .btn-primary:hover { background: var(--caramel); transform: translateY(-2px); }
+  .btn-ghost { background: none; border: none; font-family: 'Jost', sans-serif; font-size: 0.8rem; letter-spacing: 0.1em; color: var(--espresso); cursor: pointer; opacity: 0.6; display: flex; align-items: center; gap: 8px; transition: opacity 0.3s; }
+  .btn-ghost:hover { opacity: 1; }
+  .btn-ghost::after { content: '→'; font-size: 1rem; }
+  .hero-right { position: relative; background: var(--espresso); overflow: hidden; }
+  .hero-img-wrap { position: absolute; inset: 0; background: linear-gradient(135deg, #4a2c1a 0%, #2C1A0E 60%, #1a0e06 100%); display: flex; align-items: center; justify-content: center; }
+  .cup-art { width: 320px; height: 320px; position: relative; opacity: 0.15; }
+  .hero-badge { position: absolute; bottom: 60px; left: -32px; background: var(--caramel); color: white; padding: 28px; width: 140px; text-align: center; }
+  .hero-badge .num { font-family: 'Playfair Display', serif; font-size: 2.5rem; font-weight: 700; line-height: 1; display: block; }
+  .hero-badge .label { font-size: 0.65rem; letter-spacing: 0.12em; text-transform: uppercase; opacity: 0.85; margin-top: 4px; display: block; }
+  .steam-wrap { position: absolute; bottom: 90px; right: 80px; opacity: 0.6; }
+  .marquee-bar { background: var(--espresso); color: var(--latte); padding: 18px 0; overflow: hidden; white-space: nowrap; }
+  .marquee-inner { display: inline-flex; animation: marquee 18s linear infinite; gap: 80px; font-size: 0.75rem; letter-spacing: 0.2em; text-transform: uppercase; font-weight: 500; }
+  @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+  .section { padding: 120px 60px; }
+  .section-label { font-size: 0.72rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--caramel); font-weight: 500; margin-bottom: 16px; display: flex; align-items: center; gap: 12px; }
+  .section-label::before { content: ''; width: 32px; height: 1px; background: var(--caramel); }
+  .section-title { font-family: 'Playfair Display', serif; font-size: clamp(2rem, 3.5vw, 3.5rem); font-weight: 700; margin-bottom: 60px; max-width: 500px; line-height: 1.15; }
+  .menu-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; }
+  .menu-card { background: var(--fog); padding: 48px 40px; position: relative; overflow: hidden; cursor: pointer; transition: background 0.3s; }
+  .menu-card:hover { background: var(--espresso); color: var(--cream); }
+  .menu-card:hover .price { color: var(--latte); }
+  .menu-card:hover .card-desc { opacity: 0.6; }
+  .card-num { font-family: 'Playfair Display', serif; font-size: 0.85rem; font-style: italic; opacity: 0.3; margin-bottom: 24px; display: block; }
+  .card-name { font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 700; margin-bottom: 12px; }
+  .card-desc { font-size: 0.85rem; line-height: 1.7; opacity: 0.55; margin-bottom: 32px; transition: opacity 0.3s; }
+  .price { font-size: 1.1rem; font-weight: 500; color: var(--caramel); transition: color 0.3s; }
+  .story { padding: 120px 60px; display: grid; grid-template-columns: 1fr 1fr; gap: 100px; align-items: center; background: var(--espresso); color: var(--cream); }
+  .story-visual { position: relative; height: 520px; }
+  .story-box { position: absolute; background: var(--caramel); opacity: 0.12; border-radius: 2px; }
+  .story-box.a { width: 280px; height: 380px; top: 0; left: 40px; }
+  .story-box.b { width: 200px; height: 260px; bottom: 0; left: 0; background: var(--latte); opacity: 0.08; }
+  .story-box.c { width: 160px; height: 200px; top: 60px; right: 0; background: var(--cream); opacity: 0.06; }
+  .story-quote { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-family: 'Playfair Display', serif; font-size: 5rem; color: var(--caramel); opacity: 0.25; line-height: 1; }
+  .story-year { position: absolute; bottom: 40px; right: 20px; font-family: 'Playfair Display', serif; font-size: 6rem; font-weight: 700; opacity: 0.08; color: var(--latte); line-height: 1; }
+  .story h2 { font-family: 'Playfair Display', serif; font-size: clamp(2rem, 3vw, 3rem); font-weight: 700; line-height: 1.2; margin-bottom: 28px; }
+  .story h2 em { font-style: italic; color: var(--latte); }
+  .story p { font-size: 0.95rem; line-height: 1.9; opacity: 0.65; margin-bottom: 20px; }
+  .story-stats { display: flex; gap: 48px; margin-top: 48px; padding-top: 48px; border-top: 1px solid rgba(255,255,255,0.1); }
+  .stat .num { font-family: 'Playfair Display', serif; font-size: 2.5rem; font-weight: 700; color: var(--latte); display: block; line-height: 1; }
+  .stat .label { font-size: 0.72rem; letter-spacing: 0.15em; text-transform: uppercase; opacity: 0.5; margin-top: 6px; display: block; }
+  .hours { padding: 100px 60px; background: var(--fog); display: flex; justify-content: space-between; align-items: center; gap: 60px; }
+  .hours-title { font-family: 'Playfair Display', serif; font-size: 2.5rem; font-weight: 700; max-width: 260px; line-height: 1.2; }
+  .hours-list { flex: 1; max-width: 420px; }
+  .hours-row { display: flex; justify-content: space-between; padding: 18px 0; border-bottom: 1px solid rgba(44,26,14,0.1); font-size: 0.9rem; }
+  .hours-row .day { font-weight: 500; }
+  .hours-row .time { opacity: 0.6; }
+  .hours-cta { display: flex; flex-direction: column; align-items: flex-end; gap: 20px; }
+  .address { font-size: 0.85rem; line-height: 1.7; opacity: 0.6; text-align: right; }
+  footer { background: var(--espresso); color: var(--cream); padding: 60px; display: flex; justify-content: space-between; align-items: center; }
+  footer .logo { color: var(--cream); font-size: 1.8rem; }
+  footer p { font-size: 0.8rem; opacity: 0.35; letter-spacing: 0.1em; }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+  .hero-left > * { animation: fadeUp 0.8s ease forwards; opacity: 0; }
+  .hero-left > *:nth-child(1) { animation-delay: 0.1s; }
+  .hero-left > *:nth-child(2) { animation-delay: 0.25s; }
+  .hero-left > *:nth-child(3) { animation-delay: 0.4s; }
+  .hero-left > *:nth-child(4) { animation-delay: 0.55s; }
+  @keyframes steamRise { 0%, 100% { transform: translateY(0) scaleX(1); opacity: 0.6; } 50% { transform: translateY(-12px) scaleX(1.2); opacity: 0.3; } }
+  .steam-path { animation: steamRise 3s ease-in-out infinite; }
+  .steam-path:nth-child(2) { animation-delay: 1s; }
+  .steam-path:nth-child(3) { animation-delay: 2s; }
+</style>
+</head>
+<body>
+<nav>
+  <div class="logo">Brûlé<span>.</span></div>
+  <ul>
+    <li><a href="#">Menu</a></li>
+    <li><a href="#">Náš príbeh</a></li>
+    <li><a href="#">Navštívte nás</a></li>
+    <li><a href="#">Objednať</a></li>
+  </ul>
+</nav>
+<section class="hero">
+  <div class="hero-left">
+    <div class="hero-tag">Špeciálna káva · Est. 2019</div>
+    <h1>Káva uvarená<br>s<em>dušou.</em></h1>
+    <p class="hero-desc">Káva z jedného pôvodu. Pomalé rána. Každá šálka uvarená tak, aby ste objavili chuť, akú ste nikdy predtým neokúsili.</p>
+    <div class="btn-group">
+      <button class="btn-primary">Pozrieť menu</button>
+      <button class="btn-ghost">Náš príbeh</button>
+    </div>
+  </div>
+  <div class="hero-right">
+    <div class="hero-img-wrap">
+      <svg viewBox="0 0 400 400" class="cup-art" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="200" cy="300" rx="110" ry="20" fill="#C07D3E" opacity="0.4"/>
+        <path d="M100 180 Q105 300 200 310 Q295 300 300 180Z" fill="#C07D3E" opacity="0.3"/>
+        <path d="M90 180 Q200 175 310 180" stroke="#C07D3E" stroke-width="8" stroke-linecap="round"/>
+        <path d="M300 200 Q330 200 330 230 Q330 260 300 260" stroke="#C07D3E" stroke-width="6" fill="none" stroke-linecap="round"/>
+        <circle cx="200" cy="155" r="72" fill="#C07D3E" opacity="0.15" stroke="#C07D3E" stroke-width="2"/>
+        <path d="M170 130 Q185 110 200 130 Q215 150 230 130" stroke="#C07D3E" stroke-width="4" fill="none" stroke-linecap="round" opacity="0.6"/>
+        <path d="M185 115 Q195 90 200 115" stroke="#C07D3E" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.5"/>
+      </svg>
+    </div>
+    <div class="hero-badge"><span class="num">4.9</span><span class="label">Hodnotenie</span></div>
+    <div class="steam-wrap">
+      <svg width="60" height="80" viewBox="0 0 60 80">
+        <path class="steam-path" d="M20 70 Q15 55 20 40 Q25 25 20 10" stroke="#C07D3E" stroke-width="2.5" fill="none" stroke-linecap="round" opacity="0.5"/>
+        <path class="steam-path" d="M30 70 Q35 55 30 40 Q25 25 30 10" stroke="#D4A97A" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.4"/>
+        <path class="steam-path" d="M42 65 Q38 52 42 38 Q46 24 42 10" stroke="#C07D3E" stroke-width="1.5" fill="none" stroke-linecap="round" opacity="0.3"/>
+      </svg>
+    </div>
+  </div>
+</section>
+<div class="marquee-bar">
+  <div class="marquee-inner">
+    <span>Jednodruhová</span><span>·</span><span>Studená extrakcia</span><span>·</span><span>Flat White</span><span>·</span>
+    <span>Etiópska Yirgacheffe</span><span>·</span><span>Špeciálne praženie</span><span>·</span><span>Ovsené mlieko</span><span>·</span>
+    <span>Pour Over</span><span>·</span><span>Cortado</span><span>·</span>
+    <span>Jednodruhová</span><span>·</span><span>Studená extrakcia</span><span>·</span><span>Flat White</span><span>·</span>
+    <span>Etiópska Yirgacheffe</span><span>·</span><span>Špeciálne praženie</span><span>·</span><span>Ovsené mlieko</span><span>·</span>
+    <span>Pour Over</span><span>·</span><span>Cortado</span><span>·</span>
+  </div>
+</div>
+<section class="section">
+  <div class="section-label">Čo ponúkame</div>
+  <h2 class="section-title">Jedálny lístok.</h2>
+  <div class="menu-grid">
+    <div class="menu-card"><span class="card-num">01</span><div class="card-name">Signaturné espresso</div><div class="card-desc">Intenzívne, zamatové, s tónmi horkej čokolády a pretrvávajúcim karamelom.</div><div class="price">3,20 €</div></div>
+    <div class="menu-card"><span class="card-num">02</span><div class="card-name">Ovsený flat white</div><div class="card-desc">Dvojité espresso s hodvábnym ovseným mliekom. Náš najpredávanejší nápoj.</div><div class="price">4,50 €</div></div>
+    <div class="menu-card"><span class="card-num">03</span><div class="card-name">Medový cortado</div><div class="card-desc">Rovnaké diely espressa a napeneného mlieka, dokončené kvetovým medom.</div><div class="price">4,00 €</div></div>
+    <div class="menu-card"><span class="card-num">04</span><div class="card-name">Studená extrakcia s tonikom</div><div class="card-desc">18-hodinová extrakcia, doplnená tonikom a citrónovým oranžátom.</div><div class="price">5,50 €</div></div>
+    <div class="menu-card"><span class="card-num">05</span><div class="card-name">Pour Over</div><div class="card-desc">Rotujúca jednodruhová káva, uvarená pomaly pre plný charakter zrna.</div><div class="price">5,00 €</div></div>
+    <div class="menu-card"><span class="card-num">06</span><div class="card-name">Matcha latte</div><div class="card-desc">Ceremoniálna matcha šľahaná s ovseným alebo plnotučným mliekom, jemne sladená.</div><div class="price">5,00 €</div></div>
+  </div>
+</section>
+<section class="story">
+  <div class="story-visual">
+    <div class="story-box a"></div><div class="story-box b"></div><div class="story-box c"></div>
+    <div class="story-quote">"</div><div class="story-year">2019</div>
+  </div>
+  <div>
+    <div class="section-label" style="color:var(--latte);">Náš príbeh</div>
+    <h2>Veríme, že pomalé<br>je <em>lepšie.</em></h2>
+    <p>Brûlé vzniklo v malej garáži v roku 2019 s jedným espresso strojom a dlhým zoznamom zŕn z Etiópie, Kolumbie a Guatemaly. Chceli sme robiť kávu tak, ako sa má — pomaly, starostlivo, s úmyslom.</p>
+    <p>Každé praženie robíme vlastnoručne. Každý recept testujeme desiatky krát. Spolupracujeme priamo s tromi farmami, ktoré navštevujeme aspoň raz ročne. Toto nie je len káva — je to vzťah.</p>
+    <div class="story-stats">
+      <div class="stat"><span class="num">12k+</span><span class="label">šálok mesačne</span></div>
+      <div class="stat"><span class="num">3</span><span class="label">farmárski partneri</span></div>
+      <div class="stat"><span class="num">6r</span><span class="label">v podnikaní</span></div>
+    </div>
+  </div>
+</section>
+<section class="hours">
+  <div class="hours-title">Nájdite nás.</div>
+  <div class="hours-list">
+    <div class="hours-row"><span class="day">Pondelok – Piatok</span><span class="time">7:00 – 18:00</span></div>
+    <div class="hours-row"><span class="day">Sobota</span><span class="time">8:00 – 19:00</span></div>
+    <div class="hours-row"><span class="day">Nedeľa</span><span class="time">9:00 – 17:00</span></div>
+  </div>
+  <div class="hours-cta">
+    <p class="address">Mierová 4, Bratislava<br>Staré Mesto</p>
+    <button class="btn-primary">Zobraziť trasu →</button>
+  </div>
+</section>
+<footer>
+  <div class="logo">Brûlé<span style="color:var(--caramel)">.</span></div>
+  <p>© 2025 Brûlé Coffee — Všetky práva vyhradené</p>
+</footer>
+</body>
+</html>
