@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animovaná prezentácia</title>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0f172a;
+            color: #f8fafc;
+            overflow-x: hidden;
+            position: relative;
+        }
+        
+        .animated-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            overflow: hidden;
+        }
+        
+        .animated-bg div {
+            position: absolute;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #00c9ff, #92fe9d);
+            opacity: 0.1;
+            animation: float 20s ease-in-out infinite;
+        }
+        
+        .animated-bg div:nth-child(1) {
+            width: 300px;
+            height: 300px;
+            top: -150px;
+            left: -150px;
+            animation-delay: 0s;
+        }
+        
+        .animated-bg div:nth-child(2) {
+            width: 200px;
+            height: 200px;
+            bottom: -100px;
+            right: -100px;
+            animation-delay: 5s;
+        }
+        
+        .animated-bg div:nth-child(3) {
+            width: 400px;
+            height: 400px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation-delay: 10s;
+        }
+        
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px) rotate(0deg);
+            }
+            50% {
+                transform: translateY(-30px) rotate(180deg);
+            }
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: -1;
+        }
+        
+        header {
+            text-align: center;
+            padding: 100px 0 60px;
+        }
+        
+        header h1 {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            background: linear-gradient(to right, #00c9ff, #92fe9d);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            position: relative;
+            display: inline-block;
+        }
+        
+        header h1::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(to right, #00c9ff, #92fe9d);
+            border-radius: 2px;
+        }
+        
+        header p {
+            font-size: 1.4rem;
+            opacity: 0.8;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .section {
+            padding: 100px 0;
+            position: relative;
+            opacity: 0;
+            transform: translateY(50px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+        
+        .section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .section:nth-child(even) {
+            background: rgba(0, 0, 0, 0.2);
+        }
+        
+        .section-title {
+            font-size: 2.5rem;
+            margin-bottom: 40px;
+            text-align: center;
+            color: #fff;
+            position: relative;
+        }
+        
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(to right, #00c9ff, #92fe9d);
+            border-radius: 2px;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+        
+        .feature-card {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            transition: all 0.4s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            border-color: rgba(0, 201, 255, 0.3);
+        }
+        
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, #00c9ff, #92fe9d);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+        
+        .feature-card:hover::before {
+            opacity: 1;
+        }
+        
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 25px;
+            display: block;
+            color: #00c9ff;
+            filter: drop-shadow(0 0 10px rgba(0, 201, 255, 0.5));
+        }
+        
+        .feature-card h3 {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            color: #fff;
+        }
+        
+        .feature-card p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            line-height: 1.7;
+        }
+        
+        .stats-section {
+            text-align: center;
+        }
+        
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
+        }
+        
+        .stat-item {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            transition: all 0.4s ease;
+        }
+        
+        .stat-item:hover {
+            transform: scale(1.05);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            background: linear-gradient(to right, #00c9ff, #92fe9d);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .stat-label {
+            font-size: 1.3rem;
+            opacity: 0.9;
+        }
+        
+        .interactive-demo {
+            text-align: center;
+            padding: 80px 0;
+        }
+        
+        .demo-container {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 25px;
+            padding: 40px;
+            max-width: 600px;
+            margin: 0 auto;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .demo-container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(0, 201, 255, 0.1), transparent);
+            animation: rotate 20s linear infinite;
+        }
+        
+        @keyframes rotate {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+        
+        .demo-title {
+            font-size: 2rem;
+            margin-bottom: 30px;
+            color: #fff;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .accordion {
+            margin-top: 30px;
+        }
+        
+        .accordion-item {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
+            margin-bottom: 15px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .accordion-header {
+            padding: 20px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+        
+        .accordion-header:hover {
+            background: rgba(0, 0, 0, 0.3);
+        }
+        
+        .accordion-header h4 {
+            font-size: 1.3rem;
+            margin: 0;
+            color: #fff;
+            flex: 1;
+        }
+        
+        .accordion-icon {
+            font-size: 1.2rem;
+            transition: transform 0.3s ease;
+        }
+        
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease;
+            background: rgba(0, 0, 0, 0.1);
+        }
+        
+        .accordion-content p {
+            padding: 20px;
+            color: #e2e8f0;
+            line-height: 1.6;
+        }
+        
+        .accordion-item.active .accordion-content {
+            max-height: 200px;
+        }
+        
+        .accordion-item.active .accordion-icon {
+            transform: rotate(180deg);
+        }
+        
+        .tabs-container {
+            margin-top: 30px;
+        }
+        
+        .tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 25px;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .tab-btn {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #f0f0f0;
+            padding: 12px 24px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+        
+        .tab-btn:hover {
+            background: rgba(0, 0, 0, 0.4);
+        }
+        
+        .tab-btn.active {
+            background: linear-gradient(45deg, #00c9ff, #92fe9d);
+            color: #0f172a;
+            box-shadow: 0 0 15px rgba(0, 201, 255, 0.3);
+        }
+        
+        .tab-content {
+            display: none;
+            text-align: center;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .tab-content img {
+            max-width: 100%;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 60px 0 30px;
+            font-size: 1rem;
+            opacity: 0.6;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .back-link {
+            display: inline-block;
+            margin-top: 20px;
+            color: #00c9ff;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .back-link:hover {
+            text-decoration: underline;
+            opacity: 0.8;
+        }
+        
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2.5rem;
+            }
+            
+            .section-title {
+                font-size: 2rem;
+            }
+            
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            header h1 {
+                font-size: 2rem;
+            }
+            
+            header p {
+                font-size: 1.1rem;
+            }
+            
+            .section {
+                padding: 60px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="animated-bg">
+        <div></div>
+        <div></div>
+        <div></div>
+    </div>
+    
+    <div class="container">
+        <header>
+            <h1>Pokročilá webová prezentácia</h1>
+            <p>Ukážka pokročilých webových technológií vrátane scroll animácií, interaktívnych komponentov a moderných efektov</p>
+        </header>
+        
+        <!-- Section 1: Úvod -->
+        <section class="section" id="intro">
+            <div class="section-title">Prečo moderný web?</div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <h3>Výkon</h3>
+                    <p>Optimalizované načítajanie a hladké animácie pre použitie na všetkých zariadeniach.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🎨</div>
+                    <h3>Dizajn</h3>
+                    <p>Moderný a atraktívny vizuálny štýl s pozornosťou na detaily.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">💡</div>
+                    <h3>Inovácia</h3>
+                    <p>Používanie najnovších webových technológií a trendov.</p>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Section 2: Statistiky -->
+        <section class="section" id="stats">
+            <div class="section-title">Naše štatistiky</div>
+            <div class="stats-container">
+                <div class="stat-item">
+                    <div class="stat-number">500+</div>
+                    <div class="stat-label">Spokojní klienti</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">1200+</div>
+                    <div class="stat-label">Dokončené projekty</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">8</div>
+                    <div class="stat-label">Rok skúseností</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">99%</div>
+                    <div class="stat-label">Uspokojenosť</div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Section 3: Interaktívna ukážka -->
+        <section class="section" id="demo">
+            <div class="section-title">Interaktívna ukážka</div>
+            <div class="interactive-demo">
+                <div class="demo-container">
+                    <h2 class="demo-title">Skúste naše komponenty</h2>
+                    
+                    <!-- Akordeón -->
+                    <div class="accordion">
+                        <div class="accordion-item">
+                            <div class="accordion-header">
+                                <h4>Ako to funguje?</h4>
+                                <div class="accordion-icon">+</div>
+                            </div>
+                            <div class="accordion-content">
+                                <p>Naše interaktívne komponenty reagujú na vaše akcie v reálnom čase, poskytujúc okamžitú spätnú väzdu a plynulý používateľský zážitok.</p>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <div class="accordion-header">
+                                <h4>Prečo si vybrať naše riešenia?</h4>
+                                <div class="accordion-icon">+</div>
+                            </div>
+                            <div class="accordion-content">
+                                <p>Kombinujeme technickú dokonalosť s kreatívnym prístupom, aby sme vytvorili webové stránky, ktoré nie len fungujú skvele, ale aj výnimočne vyzerajú.</p>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <div class="accordion-header">
+                                <h4>Aké sú ďalšie kroky?</h4>
+                                <div class="accordion-icon">+</div>
+                            </div>
+                            <div class="accordion-content">
+                                <p>Kontaktujte nás pre bezplatnú konzultáciu, kde si preberieme vaše potreby a navrhneme optimálne riešenie šité na mieru.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Tabs -->
+                    <div class="tabs-container">
+                        <div class="tabs">
+                            <button class="tab-btn active" data-tab="tab1">Komponenty</button>
+                            <button class="tab-btn" data-tab="tab2">Animácie</button>
+                            <button class="tab-btn" data-tab="tab3">Responzívnosť</button>
+                        </div>
+                        <div class="tab-content active" id="tab1">
+                            <p>Naše komponenty sú navrhnuté tak, aby boli opakovateľné, údržbové a ľahko integrovateľné do akéhokoľvek projektu.</p>
+                        </div>
+                        <div class="tab-content" id="tab2">
+                            <p>Používame pokročilé CSS animácie a JavaScript techniky na vytváranie plynulých a zaujímavých vizuálnych efektov.</p>
+                        </div>
+                        <div class="tab-content" id="tab3">
+                            <p>Všetky naše riešenia sú plne responzívne a vyzerajú skvele na všetkých zariadeniach od smartfónov po velké monitory.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Section 4: Záver -->
+        <section class="section" id="conclusion">
+            <div class="section-title">Pripravení na ďalšiu úroveň?</div>
+            <p style="text-align: center; font-size: 1.4rem; max-width: 800px; margin: 0 auto 40px; opacity: 0.9;">
+                Kontaktujte nás ešte dnes a zistite, ako môžeme pomôcť zvýšiť vašu online prítomnosť na ďalšiu úroveň s našimi pokročilými webovými riešeniami.
+            </p>
+            <a href="index.html" class="back-link">← Späť na hlavnú stránku</a>
+        </section>
+    </div>
+
+    <script>
+        // Scroll animation observer
+        const sections = document.querySelectorAll('.section');
+        
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -100px 0px'
+        };
+        
+        const sectionObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+        
+        sections.forEach(section => {
+            sectionObserver.observe(section);
+        });
+        
+        // Accordion functionality
+        document.querySelectorAll('.accordion-header').forEach(header => {
+            header.addEventListener('click', () => {
+                const item = header.parentElement;
+                item.classList.toggle('active');
+            });
+        });
+        
+        // Tabs functionality
+        document.querySelectorAll('.tab-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                const tabId = button.dataset.tab;
+                
+                // Deactivate all tabs
+                document.querySelectorAll('.tab-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.classList.remove('active');
+                });
+                
+                // Activate clicked tab
+                button.classList.add('active');
+                document.getElementById(tabId).classList.add('active');
+            });
+        });
+        
+        // Parallax effect for header
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            const header = document.querySelector('header');
+            if (header) {
+                header.style.transform = `translateY(${scrolled * 0.3}px)`;
+            }
+        });
+        
+        // Initialize with first section visible if at top
+        window.addEventListener('load', () => {
+            if (window.pageYOffset < 100) {
+                sections.forEach(section => {
+                    if (section.id === 'intro') {
+                        section.classList.add('visible');
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

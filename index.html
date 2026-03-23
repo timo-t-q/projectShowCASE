@@ -1,97 +1,234 @@
+
 <!DOCTYPE html>
-<html lang="en">
+<html lang="sk">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Project Proposals</title>
-
-<style>
-    body {
-        margin: 0;
-        font-family: Arial, sans-serif;
-        background-color: #0f172a;
-        color: #e5e7eb;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-    }
-
-    .container {
-        display: flex;
-        gap: 30px;
-        background: #111827;
-        padding: 40px;
-        border-radius: 16px;
-        box-shadow: 0 0 30px rgba(0,0,0,0.5);
-    }
-
-    .card {
-        width: 200px;
-        text-align: center;
-        padding: 20px;
-        border-radius: 12px;
-        background: #1f2933;
-        transition: 0.3s;
-    }
-
-    .card:hover {
-        transform: translateY(-5px);
-        background: #273449;
-    }
-
-    .number {
-        font-size: 48px;
-        color: #38bdf8;
-        margin-bottom: 10px;
-    }
-
-    .text {
-        font-size: 14px;
-        color: #9ca3af;
-        margin-bottom: 20px;
-    }
-
-    .btn {
-        display: inline-block;
-        padding: 10px 20px;
-        background: #38bdf8;
-        color: #0f172a;
-        text-decoration: none;
-        border-radius: 6px;
-        font-weight: bold;
-        transition: 0.2s;
-    }
-
-    .btn:hover {
-        background: #0ea5e9;
-    }
-</style>
-</head>
-
-<body>
-
-<div class="container">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Freelancer Web Showcase</title>
     
-    <div class="card">
-        <div class="number">1</div>
-        <div class="text">This is just the app for ai generating with the features(demo)</div>
-        <a class="btn" href="printai_prototype.html" target="_blank">OPEN</a>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            color: #f0f0f0;
+            min-height: 100vh;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 20px;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, #00c9ff, #92fe9d);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.8;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .showcase-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .showcase-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            height: 220px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .showcase-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            border-color: rgba(0, 201, 255, 0.5);
+        }
+        
+        .card-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 25px;
+        }
+        
+        .card-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: center;
+            opacity: 0.8;
+        }
+        
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+        }
+        
+        .card-description {
+            font-size: 0.95rem;
+            line-height: 1.5;
+            opacity: 0.9;
+            margin-bottom: 20px;
+            flex-grow: 1;
+        }
+        
+        .card-link {
+            display: inline-block;
+            padding: 12px 24px;
+            background: linear-gradient(45deg, #00c9ff, #92fe9d);
+            color: #0f172a;
+            text-decoration: none;
+            font-weight: 600;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            font-size: 0.95rem;
+            letter-spacing: 0.5px;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 201, 255, 0.3);
+        }
+        
+        .card-link:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 201, 255, 0.5);
+            background: linear-gradient(45deg, #00b8ff, #82f08d);
+        }
+        
+        .card-badge {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: rgba(0, 201, 255, 0.2);
+            color: #00c9ff;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            border: 1px solid rgba(0, 201, 255, 0.3);
+        }
+        
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .header p {
+                font-size: 1rem;
+            }
+            
+            .showcase-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .card-content {
+                padding: 20px;
+            }
+            
+            .card-title {
+                font-size: 1.25rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Web Development Showcase</h1>
+        <p>A collection of my web development projects demonstrating various skills from static sites to interactive applications</p>
     </div>
-
-    <div class="card">
-        <div class="number">2</div>
-        <div class="text">This is the web app for the ai generation but works on all browsers</div>
-        <a class="btn" href="threadai_web_prototype.html" target="_blank">OPEN</a>
+    
+    <div class="showcase-grid">
+        <!-- Site 1: Interactive Basic Level -->
+        <div class="showcase-card">
+            <div class="card-badge">Interaktívna</div>
+            <div class="card-content">
+                <div class="card-icon">🧮</div>
+                <div class="card-title">Interaktívna kalkulačka</div>
+                <div class="card-description">
+                    Jednoduchá ale plne funkčná kalkulačka s základnými aritmetickými operáciami. Demonstruje manipuláciu DOM a event handling.
+                </div>
+                <a class="card-link" href="calculator.html" target="_blank">Skúsiť</a>
+            </div>
+        </div>
+        
+        <!-- Site 2: Interactive Basic Level -->
+        <div class="showcase-card">
+            <div class="card-badge">Interaktívna</div>
+            <div class="card-content">
+                <div class="card-icon">🎨</div>
+                <div class="card-title">Farbový menič pozadia</div>
+                <div class="card-description">
+                    Interaktívna aplikácia na menenie farieb pozadia pomocou posuvníkov RGB. Ukreňuje práci s formulármi a dynamické štýlovanie.
+                </div>
+                <a class="card-link" href="color-changer.html" target="_blank">Skúsiť</a>
+            </div>
+        </div>
+        
+        <!-- Site 3: Static -->
+        <div class="showcase-card">
+            <div class="card-badge">Statická</div>
+            <div class="card-content">
+                <div class="card-icon">👤</div>
+                <div class="card-title">O mně - Portfolio</div>
+                <div class="card-description">
+                    Statická prezentácia portfolio s informáciami o mojich zručnostiach, skúsenostiach a kontaktných údajoch. Čistý a profesionálny dizajn.
+                </div>
+                <a class="card-link" href="about-me.html" target="_blank">Prečítať</a>
+            </div>
+        </div>
+        
+        <!-- Site 4: Static -->
+        <div class="showcase-card">
+            <div class="card-badge">Statická</div>
+            <div class="card-content">
+                <div class="card-icon">💼</div>
+                <div class="card-title">Moje služby</div>
+                <div class="card-description">
+                    Prehľadná stránka popisujúca webové služby ktoré ponúkam, vrátane tvorby webových stránok, optimalizácie a údržby.
+                </div>
+                <a class="card-link" href="services.html" target="_blank">Prečítať</a>
+            </div>
+        </div>
+        
+        <!-- Site 5: Advanced with Animations -->
+        <div class="showcase-card">
+            <div class="card-badge">Pokročilá</div>
+            <div class="card-content">
+                <div class="card-icon">✨</div>
+                <div class="card-title">Animovaná prezentácia</div>
+                <div class="card-description">
+                    Pokročilá stránka s scroll animáciami, interaktivnými komponentami a modernými efekтами. Ukazuje pokročilé JS a CSS techniky.
+                </div>
+                <a class="card-link" href="animated-showcase.html" target="_blank">Prežiť</a>
+            </div>
+        </div>
     </div>
-
-    <div class="card">
-        <div class="number">3</div>
-        <div class="text">this would be the full app with pairing to the machine , ai generation, accounts, pricing and all the features</div>
-        <a class="btn" href="threadai_prototype.html" target="_blank">OPEN</a>
-    </div>
-
-</div>
-
 </body>
 </html>

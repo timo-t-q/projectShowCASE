@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interaktívny zoznam úloh</title>
+    
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            color: #f0f0f0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        
+        .todo-container {
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 20px;
+            padding: 30px;
+            width: 100%;
+            max-width: 450px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .todo-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .todo-header h1 {
+            font-size: 2rem;
+            margin-bottom: 15px;
+            background: linear-gradient(to right, #00c9ff, #92fe9d);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .todo-header p {
+            opacity: 0.7;
+            font-size: 1rem;
+        }
+        
+        .todo-input-section {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+        
+        .todo-input {
+            flex: 1;
+            padding: 15px 20px;
+            border: none;
+            border-radius: 50px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #f0f0f0;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+        
+        .todo-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .todo-input:focus {
+            background: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 0 0 3px rgba(0, 201, 255, 0.3);
+        }
+        
+        .add-btn {
+            background: linear-gradient(45deg, #00c9ff, #92fe9d);
+            color: #0f172a;
+            border: none;
+            padding: 0 25px;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            box-shadow: 0 4px 15px rgba(0, 201, 255, 0.3);
+        }
+        
+        .add-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 201, 255, 0.5);
+            background: linear-gradient(45deg, #00b8ff, #82f08d);
+        }
+        
+        .add-btn:active {
+            transform: translateY(0);
+        }
+        
+        .filters {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+        
+        .filter-btn {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #f0f0f0;
+            padding: 8px 16px;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+        
+        .filter-btn:hover {
+            background: rgba(0, 0, 0, 0.4);
+        }
+        
+        .filter-btn.active {
+            background: linear-gradient(45deg, #00c9ff, #92fe9d);
+            color: #0f172a;
+            box-shadow: 0 0 15px rgba(0, 201, 255, 0.3);
+        }
+        
+        .todo-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+            opacity: 0.8;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .todo-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .todo-item {
+            display: flex;
+            align-items: center;
+            padding: 18px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            margin-bottom: 12px;
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+        
+        .todo-item:hover {
+            background: rgba(0, 0, 0, 0.4);
+            transform: translateX(5px);
+        }
+        
+        .todo-item.completed {
+            opacity: 0.7;
+            border-left-color: #92fe9d;
+        }
+        
+        .todo-item.completed .todo-text {
+            text-decoration: line-through;
+        }
+        
+        .todo-checkbox {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #00c9ff;
+            border-radius: 5px;
+            margin-right: 15px;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .todo-checkbox.checked {
+            background: #00c9ff;
+        }
+        
+        .todo-checkbox.checked::after {
+            content: '';
+            position: absolute;
+            top: 4px;
+            left: 8px;
+            width: 3px;
+            height: 8px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+        
+        .todo-text {
+            flex: 1;
+            font-size: 1.1rem;
+            word-break: break-word;
+        }
+        
+        .todo-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .edit-btn, .delete-btn {
+            background: none;
+            border: none;
+            color: #f0f0f0;
+            font-size: 1rem;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+        
+        .edit-btn:hover {
+            background: rgba(0, 201, 255, 0.2);
+        }
+        
+        .delete-btn:hover {
+            background: rgba(255, 82, 82, 0.2);
+        }
+        
+        .edit-btn:active, .delete-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .clear-completed {
+            display: block;
+            width: 100%;
+            text-align: center;
+            padding: 12px;
+            background: rgba(255, 82, 82, 0.2);
+            border: none;
+            border-radius: 50px;
+            color: #ff5252;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .clear-completed:hover {
+            background: rgba(255, 82, 82, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        @media (max-width: 480px) {
+            .todo-container {
+                padding: 20px;
+            }
+            
+            .todo-header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .todo-input-section {
+                flex-direction: column;
+            }
+            
+            .todo-input {
+                padding: 15px;
+                font-size: 1rem;
+            }
+            
+            .add-btn {
+                padding: 15px;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="todo-container">
+        <div class="todo-header">
+            <h1>Zoznam úloh</h1>
+            <p>Jednoduchá aplikácia na správu denných úloh</p>
+        </div>
+        
+        <div class="todo-input-section">
+            <input type="text" id="todoInput" placeholder="Napíšte novú úlohu...">
+            <button class="add-btn" id="addBtn">Pridať</button>
+        </div>
+        
+        <div class="filters">
+            <button class="filter-btn active" data-filter="all">Všetko</button>
+            <button class="filter-btn" data-filter="active"> Aktívne</button>
+            <button class="filter-btn" data-filter="completed"> Dokončené</button>
+        </div>
+        
+        <div class="todo-stats">
+            <span id="todoCount">0 úloh</span>
+            <span id="completedCount">0 dokončených</span>
+        </div>
+        
+        <ul class="todo-list" id="todoList"></ul>
+        
+        <button class="clear-completed" id="clearCompletedBtn">Vymazať dokončené</button>
+    </div>
+
+    <script>
+        const todoInput = document.getElementById('todoInput');
+        const addBtn = document.getElementById('addBtn');
+        const todoList = document.getElementById('todoList');
+        const clearCompletedBtn = document.getElementById('clearCompletedBtn');
+        const todoCountSpan = document.getElementById('todoCount');
+        const completedCountSpan = document.getElementById('completedCount');
+        const filterButtons = document.querySelectorAll('.filter-btn');
+        
+        let todos = [];
+        let currentFilter = 'all';
+        
+        // Load todos from localStorage if available
+        function loadTodos() {
+            const saved = localStorage.getItem('todos');
+            if (saved) {
+                todos = JSON.parse(saved);
+            }
+            render();
+        }
+        
+        // Save todos to localStorage
+        function saveTodos() {
+            localStorage.setItem('todos', JSON.stringify(todos));
+        }
+        
+        // Add a new todo
+        function addTodo() {
+            const text = todoInput.value.trim();
+            if (text) {
+                todos.push({
+                    id: Date.now(),
+                    text: text,
+                    completed: false
+                });
+                todoInput.value = '';
+                saveTodos();
+                render();
+            }
+        }
+        
+        // Toggle todo completion
+        function toggleTodo(id) {
+            todos = todos.map(todo => 
+                todo.id === id ? {...todo, completed: !todo.completed} : todo
+            );
+            saveTodos();
+            render();
+        }
+        
+        // Delete a todo
+        function deleteTodo(id) {
+            todos = todos.filter(todo => todo.id !== id);
+            saveTodos();
+            render();
+        }
+        
+        // Edit a todo
+        function editTodo(id, newText) {
+            todos = todos.map(todo => 
+                todo.id === id ? {...todo, text: newText} : todo
+            );
+            saveTodos();
+            render();
+        }
+        
+        // Clear completed todos
+        function clearCompleted() {
+            todos = todos.filter(todo => !todo.completed);
+            saveTodos();
+            render();
+        }
+        
+        // Set filter
+        function setFilter(filter) {
+            currentFilter = filter;
+            filterButtons.forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.filter === filter);
+            });
+            render();
+        }
+        
+        // Get filtered todos
+        function getFilteredTodos() {
+            switch (currentFilter) {
+                case 'active':
+                    return todos.filter(todo => !todo.completed);
+                case 'completed':
+                    return todos.filter(todo => todo.completed);
+                default:
+                    return todos;
+            }
+        }
+        
+        // Render the todo list
+        function render() {
+            const filteredTodos = getFilteredTodos();
+            
+            // Update counts
+            const totalTodos = todos.length;
+            const completedTodos = todos.filter(todo => todo.completed).length;
+            todoCountSpan.textContent = `${totalTodos} úloh`;
+            completedCountSpan.textContent = `${completedTodos} dokončených`;
+            
+            // Clear and rebuild list
+            todoList.innerHTML = '';
+            
+            if (filteredTodos.length === 0) {
+                const emptyMessage = document.createElement('li');
+                emptyMessage.style.textAlign = 'center';
+                emptyMessage.style.padding = '20px';
+                emptyMessage.style.opacity = '0.5';
+                emptyMessage.textContent = currentFilter === 'active' 
+                    ? 'Žiadne aktívne úlohy' 
+                    : currentFilter === 'completed'
+                        ? 'Žiadne dokončené úlohy'
+                        : 'Žiadne úlohy. Pridajte prvú vyššie!';
+                todoList.appendChild(emptyMessage);
+                return;
+            }
+            
+            filteredTodos.forEach(todo => {
+                const li = document.createElement('li');
+                li.className = `todo-item ${todo.completed ? 'completed' : ''}`;
+                li.innerHTML = `
+                    <div class="todo-checkbox" data-id="${todo.id}"></div>
+                    <span class="todo-text">${todo.text}</span>
+                    <div class="todo-actions">
+                        <button class="edit-btn" data-id="${todo.id}" title="Upraviť">✎</button>
+                        <button class="delete-btn" data-id="${todo.id}" title="Odstrániť">×</button>
+                    </div>
+                `;
+                todoList.appendChild(li);
+            });
+            
+            // Add event listeners to new elements
+            document.querySelectorAll('.todo-checkbox').forEach(checkbox => {
+                checkbox.addEventListener('click', (e) => {
+                    const id = parseInt(e.target.dataset.id);
+                    toggleTodo(id);
+                });
+            });
+            
+            document.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const id = parseInt(e.target.dataset.id);
+                    deleteTodo(id);
+                });
+            });
+            
+            document.querySelectorAll('.edit-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const id = parseInt(e.target.dataset.id);
+                    const todo = todos.find(t => t.id === id);
+                    const newText = prompt('Upraviť úlohu:', todo.text);
+                    if (newText !== null && newText.trim() !== '') {
+                        editTodo(id, newText.trim());
+                    }
+                });
+            });
+        }
+        
+        // Event listeners
+        addBtn.addEventListener('click', addTodo);
+        
+        todoInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                addTodo();
+            }
+        });
+        
+        filterButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                setFilter(btn.dataset.filter);
+            });
+        });
+        
+        clearCompletedBtn.addEventListener('click', clearCompleted);
+        
+        // Initial load
+        loadTodos();
+    </script>
+</body>
+</html>
