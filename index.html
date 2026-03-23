@@ -1,234 +1,494 @@
-
 <!DOCTYPE html>
 <html lang="sk">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Freelancer Web Showcase</title>
+    <title>Tibor Kováč - Web Developer Portfolio</title>
     
     <style>
-        body {
+        * {
             margin: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-            color: #f0f0f0;
-            min-height: 100vh;
-            padding: 20px;
+            padding: 0;
             box-sizing: border-box;
         }
         
-        .header {
-            text-align: center;
-            margin-bottom: 40px;
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            color: #e2e8f0;
+            line-height: 1.7;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
             padding: 20px;
         }
         
-        .header h1 {
-            font-size: 2.5rem;
+        header {
+            text-align: center;
+            padding: 100px 0 60px;
+        }
+        
+        header h1 {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            background: linear-gradient(to right, #00c9ff, #92fe9d);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            position: relative;
+            display: inline-block;
+        }
+        
+        header h1::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(to right, #00c9ff, #92fe9d);
+            border-radius: 2px;
+        }
+        
+        header p {
+            font-size: 1.4rem;
+            opacity: 0.8;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .stats-section {
+            text-align: center;
+            padding: 60px 0;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 20px;
+            margin-bottom: 60px;
+        }
+        
+        .stats-container {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            flex-wrap: wrap;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 700;
+            display: block;
             margin-bottom: 10px;
             background: linear-gradient(to right, #00c9ff, #92fe9d);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
         
-        .header p {
+        .stat-label {
             font-size: 1.2rem;
-            opacity: 0.8;
-            max-width: 600px;
-            margin: 0 auto;
+            opacity: 0.9;
         }
         
-        .showcase-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 25px;
-            max-width: 1200px;
-            margin: 0 auto;
+        .projects-section {
+            margin-bottom: 80px;
         }
         
-        .showcase-card {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 16px;
-            overflow: hidden;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        .section-title {
+            font-size: 2.5rem;
+            margin-bottom: 40px;
+            text-align: center;
+            color: #fff;
             position: relative;
-            height: 220px;
-            display: flex;
-            flex-direction: column;
         }
         
-        .showcase-card:hover {
-            transform: translateY(-10px) scale(1.02);
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(to right, #00c9ff, #92fe9d);
+            border-radius: 2px;
+        }
+        
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+        }
+        
+        .project-card {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 20px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.4s ease;
+            position: relative;
+        }
+        
+        .project-card:hover {
+            transform: translateY(-10px);
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-            border-color: rgba(0, 201, 255, 0.5);
+            border-color: rgba(0, 201, 255, 0.3);
         }
         
-        .card-content {
-            flex: 1;
+        .project-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, #00c9ff, #92fe9d);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+        
+        .project-card:hover::before {
+            opacity: 1;
+        }
+        
+        .project-image {
+            height: 200px;
+            background: linear-gradient(45deg, #1a2a63, #b21f1f);
             display: flex;
-            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 2rem;
+        }
+        
+        .project-content {
             padding: 25px;
         }
         
-        .card-icon {
-            font-size: 2.5rem;
-            margin-bottom: 15px;
-            display: flex;
-            justify-content: center;
-            opacity: 0.8;
-        }
-        
-        .card-title {
-            font-size: 1.5rem;
+        .project-tag {
+            display: inline-block;
+            background: rgba(0, 201, 255, 0.2);
+            color: #00c9ff;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
             font-weight: 600;
             margin-bottom: 15px;
-            flex-grow: 1;
-            display: flex;
-            align-items: center;
         }
         
-        .card-description {
-            font-size: 0.95rem;
-            line-height: 1.5;
+        .project-card h3 {
+            font-size: 1.6rem;
+            margin-bottom: 15px;
+            color: #fff;
+        }
+        
+        .project-card p {
+            font-size: 1rem;
             opacity: 0.9;
+            line-height: 1.6;
             margin-bottom: 20px;
-            flex-grow: 1;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
         }
         
-        .card-link {
+        .project-link {
             display: inline-block;
-            padding: 12px 24px;
             background: linear-gradient(45deg, #00c9ff, #92fe9d);
             color: #0f172a;
+            padding: 10px 20px;
+            border-radius: 50px;
             text-decoration: none;
             font-weight: 600;
-            border-radius: 50px;
+            font-size: 0.9rem;
             transition: all 0.3s ease;
-            font-size: 0.95rem;
-            letter-spacing: 0.5px;
             border: none;
             cursor: pointer;
             box-shadow: 0 4px 15px rgba(0, 201, 255, 0.3);
         }
         
-        .card-link:hover {
+        .project-link:hover {
             transform: translateY(-3px);
             box-shadow: 0 6px 20px rgba(0, 201, 255, 0.5);
             background: linear-gradient(45deg, #00b8ff, #82f08d);
         }
         
-        .card-badge {
-            position: absolute;
-            top: 15px;
-            left: 15px;
-            background: rgba(0, 201, 255, 0.2);
+        .cta-section {
+            text-align: center;
+            padding: 80px 0;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 20px;
+        }
+        
+        .cta-section h2 {
+            font-size: 2.5rem;
+            margin-bottom: 25px;
+            background: linear-gradient(to right, #feca57, #ff9ff3);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .cta-section p {
+            font-size: 1.3rem;
+            opacity: 0.9;
+            max-width: 700px;
+            margin: 0 auto 30px;
+        }
+        
+        .primary-btn {
+            background: linear-gradient(45deg, #ff6b6b, #feca57);
+            color: white;
+            padding: 15px 35px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+        }
+        
+        .primary-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(255, 107, 107, 0.5);
+            background: linear-gradient(45deg, #ff5252, #ffd93d);
+        }
+        
+        footer {
+            text-align: center;
+            padding: 60px 0 30px;
+            font-size: 1rem;
+            opacity: 0.6;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .back-link {
+            display: inline-block;
+            margin-top: 20px;
             color: #00c9ff;
-            padding: 4px 8px;
-            border-radius: 12px;
-            font-size: 0.8rem;
+            text-decoration: none;
             font-weight: 500;
-            border: 1px solid rgba(0, 201, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .back-link:hover {
+            text-decoration: underline;
+            opacity: 0.8;
         }
         
         @media (max-width: 768px) {
-            .header h1 {
+            header h1 {
+                font-size: 2.5rem;
+            }
+            
+            .section-title {
                 font-size: 2rem;
             }
             
-            .header p {
-                font-size: 1rem;
+            .projects-grid {
+                grid-template-columns: 1fr;
             }
             
-            .showcase-grid {
-                grid-template-columns: 1fr;
+            .stats-container {
+                flex-direction: column;
+                gap: 20px;
             }
         }
         
         @media (max-width: 480px) {
-            .card-content {
-                padding: 20px;
+            header h1 {
+                font-size: 2rem;
             }
             
-            .card-title {
-                font-size: 1.25rem;
+            header p {
+                font-size: 1.1rem;
+            }
+            
+            .container {
+                padding: 15px;
             }
         }
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>Web Development Showcase</h1>
-        <p>A collection of my web development projects demonstrating various skills from static sites to interactive applications</p>
+    <header>
+        <h1>Tibor Kováč</h1>
+        <p>Senior Web Developer & UI/UX Designer</p>
+    </header>
+    
+    <div class="container">
+        <section class="stats-section">
+            <div class="stats-container">
+                <div class="stat-item">
+                    <div class="stat-number">5+</div>
+                    <div class="stat-label">Rok skúseností</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">50+</div>
+                    <div class="stat-label">Dokončené projekty</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">100%</div>
+                    <div class="stat-label">Spokojní klienti</div>
+                </div>
+            </div>
+        </section>
+        
+        <section class="projects-section">
+            <h2 class="section-title">Moje Projekty</h2>
+            <div class="projects-grid">
+                <!-- Interactive Basic Level Projects -->
+                <div class="project-card">
+                    <div class="project-image">🧮</div>
+                    <div class="project-content">
+                        <span class="project-tag">Interaktívna</span>
+                        <h3>Interaktívna kalkulačka</h3>
+                        <p>Plne funkčná kalkulačka s základnými aritmetickými operáciami, demonstrujúc DOM manipuláciu a event handling v čistom JavaScripte.</p>
+                        <a class="project-link" href="calculator.html" target="_blank">Skúsiť projekt</a>
+                    </div>
+                </div>
+                
+                <div class="project-card">
+                    <div class="project-image">🎨</div>
+                    <div class="project-content">
+                        <span class="project-tag">Interaktívna</span>
+                        <h3>Farbový menič pozadia</h3>
+                        <p>Interaktívna aplikácia na menenie farieb pozadia pomocou RGB posuvníkov, ukazujúca prácu s formulármi a dynamické štýlovanie.</p>
+                        <a class="project-link" href="color-changer.html" target="_blank">Skúsiť projekt</a>
+                    </div>
+                </div>
+                
+                <div class="project-card">
+                    <div class="project-image">📋</div>
+                    <div class="project-content">
+                        <span class="project-tag">Interaktívna</span>
+                        <h3>Interaktívny zoznam úloh</h3>
+                        <p>Aplikácia na správu úloh s možnosťou pridávania, úpravy, označovania ako splnené a filtrovania, využívajúca localStorage.</p>
+                        <a class="project-link" href="todo-list.html" target="_blank">Skúsiť projekt</a>
+                    </div>
+                </div>
+                
+                <div class="project-card">
+                    <div class="project-image">🌈</div>
+                    <div class="project-content">
+                        <span class="project-tag">Interaktívna</span>
+                        <h3>Menič pozadia s presetmi</h3>
+                        <p>Rozšírený farbový menič s preddefinovanými farbovými schémami a možnosťou generovania náhodných farieb.</p>
+                        <a class="project-link" href="menicPozadia.html" target="_blank">Skúsiť projekt</a>
+                    </div>
+                </div>
+                
+                <!-- Static Projects -->
+                <div class="project-card">
+                    <div class="project-image">👤</div>
+                    <div class="project-content">
+                        <span class="project-tag">Statická</span>
+                        <h3>Portfolio - O mně</h3>
+                        <p>Profesionálna prezentácia portfolio s informáciami o skúsenostiach, zručnostiach, projektoch a kontaktných údajoch.</p>
+                        <a class="project-link" href="about-me.html" target="_blank">Prečítať viac</a>
+                    </div>
+                </div>
+                
+                <div class="project-card">
+                    <div class="project-image">💼</div>
+                    <div class="project-content">
+                        <span class="project-tag">Statická</span>
+                        <h3>Moje webové služby</h3>
+                        <p>Prehľadná stránka popisujúca webové služby ktoré ponúkam, vrátane tvorby webových stránok, optimalizácií a údržby.</p>
+                        <a class="project-link" href="services.html" target="_blank">Prečítať viac</a>
+                    </div>
+                </div>
+                
+                <!-- Advanced Projects with Animations -->
+                <div class="project-card">
+                    <div class="project-image">✨</div>
+                    <div class="project-content">
+                        <span class="project-tag">Pokročilá</span>
+                        <h3>Animovaná prezentácia</h3>
+                        <p>Pokročilá stránka s scroll animáciami, interaktívnymi komponentami (akordeón, tabs) a modernými CSS/JS efekтами.</p>
+                        <a class="project-link" href="animated-showcase.html" target="_blank">Skúsiť projekt</a>
+                    </div>
+                </div>
+                
+                <!-- Demo Projects -->
+                <div class="project-card">
+                    <div class="project-image">💪</div>
+                    <div class="project-content">
+                        <span class="project-tag">Demo</span>
+                        <h3>Fitnes centrum Iron Vault</h3>
+                        <p>Moderná webová prezentácia pre fitnes centrum s rezervačným systémom, galériou a informáciami o trénoch.</p>
+                        <a class="project-link" href="demo-fitnes-ironvault.html" target="_blank">Skúsiť demo</a>
+                    </div>
+                </div>
+                
+                <div class="project-card">
+                    <div class="project-image">🏠</div>
+                    <div class="project-content">
+                        <span class="project-tag">Demo</span>
+                        <h3>Interiérové dizajnérska forma</h3>
+                        <p>Elegantná prezentácia pre interiérového dizajnéra s portfóliom projektov, recenzie klientov a kontaktným formulárom.</p>
+                        <a class="project-link" href="demo-interier-forma.html" target="_blank">Skúsiť demo</a>
+                    </div>
+                </div>
+                
+                <div class="project-card">
+                    <div class="project-image">☕</div>
+                    <div class="project-content">
+                        <span class="project-tag">Demo</span>
+                        <h3>Kaviareň Brule</h3>
+                        <p>Teplá a pozváčivá webová prezentácia pre kaviareň s menu, online rezerváciami a informáciami o špeciálnych ponukách.</p>
+                        <a class="project-link" href="demo-kaviarei-brule.html" target="_blank">Skúsiť demo</a>
+                    </div>
+                </div>
+                
+                <div class="project-card">
+                    <div class="project-image">🍕</div>
+                    <div class="project-content">
+                        <span class="project-tag">Demo</span>
+                        <h3>Restaurácia Pizza Paradiso</h3>
+                        <p>Moderná prezentácia pre pizzeriu s online objednávkovým systémom, menu s fotografiemi a informáciami o rozvozech.</p>
+                        <a class="project-link" href="demo-restauracia-pizza.html" target="_blank">Skúsiť demo</a>
+                    </div>
+                </div>
+                
+                <div class="project-card">
+                    <div class="project-image">🏔️</div>
+                    <div class="project-content">
+                        <span class="project-tag">Demo</span>
+                        <h3>Restaurácia Koliba</h3>
+                        <p>Tradičná prezentácia pre horskú kolibu s menu, rezerváciami stolov, informáciami o špeciálnych akciách a galériou priestoru.</p>
+                        <a class="project-link" href="demo-restauracia-koliba.html" target="_blank">Skúsiť demo</a>
+                    </div>
+                </div>
+                
+                <div class="project-card">
+                    <div class="project-image">☁️</div>
+                    <div class="project-content">
+                        <span class="project-tag">Demo</span>
+                        <h3>SaaS Orbit Platform</h3>
+                        <p>Profesionálna prezentácia pre SaaS produkt s ukážkami funkcií, cenovými plánmi a informáciami o bezpečnosti a podpore.</p>
+                        <a class="project-link" href="demo-saas-orbit.html" target="_blank">Skúsiť demo</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section class="cta-section">
+            <h2>Pripravení na váš projekt?</h2>
+            <p>Mám skúsenosti s tvorbou webových stránok a aplikácií pre rôzne odvetvia a veľkosti projektov. Pojďme spolu vytvoriť niečo úžasné.</p>
+            <a href="about-me.html" class="primary-btn">Začneme?</a>
+        </section>
     </div>
     
-    <div class="showcase-grid">
-        <!-- Site 1: Interactive Basic Level -->
-        <div class="showcase-card">
-            <div class="card-badge">Interaktívna</div>
-            <div class="card-content">
-                <div class="card-icon">🧮</div>
-                <div class="card-title">Interaktívna kalkulačka</div>
-                <div class="card-description">
-                    Jednoduchá ale plne funkčná kalkulačka s základnými aritmetickými operáciami. Demonstruje manipuláciu DOM a event handling.
-                </div>
-                <a class="card-link" href="calculator.html" target="_blank">Skúsiť</a>
-            </div>
+    <footer>
+        &copy; 2026 Tibor Kováč. Všetky práva vyhradené.
+        <div>
+            <a href="#" class="back-link">Späť na obsah</a>
         </div>
-        
-        <!-- Site 2: Interactive Basic Level -->
-        <div class="showcase-card">
-            <div class="card-badge">Interaktívna</div>
-            <div class="card-content">
-                <div class="card-icon">🎨</div>
-                <div class="card-title">Farbový menič pozadia</div>
-                <div class="card-description">
-                    Interaktívna aplikácia na menenie farieb pozadia pomocou posuvníkov RGB. Ukreňuje práci s formulármi a dynamické štýlovanie.
-                </div>
-                <a class="card-link" href="color-changer.html" target="_blank">Skúsiť</a>
-            </div>
-        </div>
-        
-        <!-- Site 3: Static -->
-        <div class="showcase-card">
-            <div class="card-badge">Statická</div>
-            <div class="card-content">
-                <div class="card-icon">👤</div>
-                <div class="card-title">O mně - Portfolio</div>
-                <div class="card-description">
-                    Statická prezentácia portfolio s informáciami o mojich zručnostiach, skúsenostiach a kontaktných údajoch. Čistý a profesionálny dizajn.
-                </div>
-                <a class="card-link" href="about-me.html" target="_blank">Prečítať</a>
-            </div>
-        </div>
-        
-        <!-- Site 4: Static -->
-        <div class="showcase-card">
-            <div class="card-badge">Statická</div>
-            <div class="card-content">
-                <div class="card-icon">💼</div>
-                <div class="card-title">Moje služby</div>
-                <div class="card-description">
-                    Prehľadná stránka popisujúca webové služby ktoré ponúkam, vrátane tvorby webových stránok, optimalizácie a údržby.
-                </div>
-                <a class="card-link" href="services.html" target="_blank">Prečítať</a>
-            </div>
-        </div>
-        
-        <!-- Site 5: Advanced with Animations -->
-        <div class="showcase-card">
-            <div class="card-badge">Pokročilá</div>
-            <div class="card-content">
-                <div class="card-icon">✨</div>
-                <div class="card-title">Animovaná prezentácia</div>
-                <div class="card-description">
-                    Pokročilá stránka s scroll animáciami, interaktivnými komponentami a modernými efekтами. Ukazuje pokročilé JS a CSS techniky.
-                </div>
-                <a class="card-link" href="animated-showcase.html" target="_blank">Prežiť</a>
-            </div>
-        </div>
-    </div>
+    </footer>
 </body>
 </html>
